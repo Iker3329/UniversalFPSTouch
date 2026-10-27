@@ -938,7 +938,7 @@ var css='#cod-tc{position:fixed;inset:0;z-index:2147483000;pointer-events:none;t
 var st=document.createElement('style');st.textContent=css;document.documentElement.appendChild(st);
 var root=document.createElement('div');root.id='cod-tc';
 root.innerHTML='<div class="s" data-t="stick"><div class="k" id="cod-k"></div></div><div class="b" data-t="fire">FIRE</div><div class="b" data-t="ads">ADS</div><div class="b" data-t="reload">RLD</div><div class="b" data-t="jump">JUMP</div><div class="b" data-t="stance">STANCE</div><div class="b" data-t="stats">STATS</div>';
-document.documentElement.appendChild(root);var tb=document.createElement('button');tb.textContent='Hide pads';tb.style.cssText='position:fixed;left:10px;top:10px;z-index:2147483001;padding:8px 12px;border:0;border-radius:20px;background:rgba(30,30,30,.9);color:#fff;font:700 13px system-ui';document.documentElement.appendChild(tb);var hid=false;tb.onclick=function(){hid=!hid;root.style.display=hid?'none':'block';tb.textContent=hid?'Show pads':'Hide pads';tb.style.background=hid?'rgba(110,194,110,.9)':'rgba(30,30,30,.9)';tb.style.color=hid?'#183318':'#fff';};var kb=document.createElement('button');kb.textContent='\u2328';kb.title='Keyboard';kb.style.cssText='position:fixed;left:10px;bottom:10px;z-index:2147483001;width:48px;height:48px;border:0;border-radius:50%;background:rgba(30,30,30,.9);color:#fff;font:22px system-ui';document.documentElement.appendChild(kb);var gi=document.createElement('input');gi.type='text';gi.autocomplete='off';gi.spellcheck=false;gi.placeholder='Type name, then Send';gi.style.cssText='position:fixed;left:0;right:72px;bottom:0;z-index:2147483002;padding:12px 14px;font-size:16px;border:0;border-top:1px solid #444;background:rgba(16,14,20,.96);color:#fff;display:none;box-sizing:border-box';document.documentElement.appendChild(gi);var sb=document.createElement('button');sb.textContent='Send';sb.style.cssText='position:fixed;right:8px;bottom:8px;z-index:2147483003;padding:10px 14px;border:0;border-radius:8px;background:#6ec26e;color:#183318;font:700 15px system-ui;display:none';document.documentElement.appendChild(sb);var kopen=false;function gCanvas(){return document.getElementById('canvas')||document.querySelector('canvas')}function gTargets(){var a=[],c=gCanvas();if(c)a.push(c);try{if(window.Module&&Module.canvas)a.push(Module.canvas)}catch(e){}a.push(document.body,document,window);return a}function focusC(){var c=gCanvas();try{if(c&&c.focus)c.focus({preventScroll:true})}catch(e){}}function fakeEv(type,key,code,kc,cc){var c=gCanvas()||document.body;return{type:type,key:key,code:code||'',keyCode:kc|0,which:kc|0,charCode:cc|0,location:0,ctrlKey:false,shiftKey:false,altKey:false,metaKey:false,repeat:false,bubbles:true,cancelable:true,defaultPrevented:false,isTrusted:true,target:c,currentTarget:c,srcElement:c,view:window,preventDefault:function(){this.defaultPrevented=true},stopPropagation:function(){},stopImmediatePropagation:function(){}}}function callJE(type,fake){var pools=[];try{if(typeof JSEvents!=='undefined')pools.push(JSEvents)}catch(e){}try{if(window.JSEvents)pools.push(window.JSEvents)}catch(e){}for(var p=0;p<pools.length;p++){var hs=pools[p].eventHandlers||[];for(var i=0;i<hs.length;i++){var h=hs[i],et=h.eventTypeString||h.eventTypeName||'';if(et!==type)continue;var fn=h.handlerFunc||h.callbackFunc||h.handler;if(typeof fn==='function'){try{fn(fake)}catch(e){}try{fn(type,fake)}catch(e){}}}}}function fire(type,key,code,kc,cc){var fake=fakeEv(type,key,code,kc,cc);callJE(type,fake);var targets=gTargets();for(var i=0;i<targets.length;i++){var t=targets[i];try{var prop='on'+type;if(t&&typeof t[prop]==='function')t[prop](fake)}catch(e){}try{var ev=new KeyboardEvent(type,{key:key,code:code||'',keyCode:kc|0,which:kc|0,charCode:cc|0,bubbles:true,cancelable:true});t.dispatchEvent(ev)}catch(e){}try{var ge=document.createEvent('Event');ge.initEvent(type,true,true);try{ge.keyCode=kc|0;ge.which=kc|0;ge.charCode=cc|0;ge.key=key}catch(e){}t.dispatchEvent(ge)}catch(e){}}}function injChar(ch){var key=ch,code='',kc=ch.charCodeAt(0),cc=kc;if(ch===' '){code='Space';kc=32;cc=32}else if(ch>='a'&&ch<='z'){code='Key'+ch.toUpperCase();kc=ch.toUpperCase().charCodeAt(0)}else if(ch>='A'&&ch<='Z'){code='Key'+ch}else if(ch>='0'&&ch<='9'){code='Digit'+ch}focusC();fire('keydown',key,code,kc,cc);fire('keypress',key,code,cc,cc);fire('keyup',key,code,kc,0)}function injSpecial(n){var m={Backspace:['Backspace','Backspace',8],Enter:['Enter','Enter',13]};var x=m[n];if(!x)return;focusC();fire('keydown',x[0],x[1],x[2],0);if(n==='Enter')fire('keypress',x[0],x[1],x[2],x[2]);fire('keyup',x[0],x[1],x[2],0)}function setKB(on){kopen=!!on;gi.style.display=kopen?'block':'none';sb.style.display=kopen?'block':'none';kb.style.background=kopen?'rgba(110,194,110,.95)':'rgba(30,30,30,.9)';kb.style.color=kopen?'#183318':'#fff';if(kopen){gi.value='';setTimeout(function(){try{gi.focus()}catch(e){}},50)}else{try{gi.blur()}catch(e){}}}kb.onclick=function(e){e.preventDefault();e.stopPropagation();setKB(!kopen)};function sendText(){var t=gi.value||'';if(t){for(var i=0;i<t.length;i++)injChar(t[i]);gi.value=''}injSpecial('Enter');setTimeout(function(){try{gi.focus()}catch(e){}},50)}sb.onclick=function(e){e.preventDefault();e.stopPropagation();sendText()};gi.addEventListener('keydown',function(e){if(e.key==='Backspace')injSpecial('Backspace');if(e.key==='Enter'){e.preventDefault();sendText()}});gi.addEventListener('beforeinput',function(e){if(e.inputType==='insertText'&&e.data){for(var i=0;i<e.data.length;i++)injChar(e.data.charAt(i))}else if(e.inputType==='deleteContentBackward')injSpecial('Backspace')});gi.addEventListener('input',function(){var v=gi.value;if(!v)return;for(var i=0;i<v.length;i++)injChar(v[i]);gi.value=''});
+document.documentElement.appendChild(root);var tb=document.createElement('button');tb.textContent='Hide pads';tb.style.cssText='position:fixed;left:10px;top:10px;z-index:2147483001;padding:8px 12px;border:0;border-radius:20px;background:rgba(30,30,30,.9);color:#fff;font:700 13px system-ui';document.documentElement.appendChild(tb);var hid=false;tb.onclick=function(){hid=!hid;root.style.display=hid?'none':'block';tb.textContent=hid?'Show pads':'Hide pads';tb.style.background=hid?'rgba(110,194,110,.9)':'rgba(30,30,30,.9)';tb.style.color=hid?'#183318':'#fff';};var kb=document.createElement('button');kb.textContent='\u2328';kb.title='Keyboard';kb.style.cssText='position:fixed;left:10px;bottom:10px;z-index:2147483001;width:48px;height:48px;border:0;border-radius:50%;background:rgba(30,30,30,.9);color:#fff;font:22px system-ui';document.documentElement.appendChild(kb);var gi=document.createElement('input');gi.type='text';gi.autocomplete='off';gi.spellcheck=false;gi.placeholder='Type full name, then Send';gi.style.cssText='position:fixed;left:0;right:72px;bottom:0;z-index:2147483002;padding:12px 14px;font-size:16px;border:0;border-top:1px solid #444;background:rgba(16,14,20,.96);color:#fff;display:none;box-sizing:border-box';document.documentElement.appendChild(gi);var sb=document.createElement('button');sb.textContent='Send';sb.style.cssText='position:fixed;right:8px;bottom:8px;z-index:2147483003;padding:10px 14px;border:0;border-radius:8px;background:#6ec26e;color:#183318;font:700 15px system-ui;display:none';document.documentElement.appendChild(sb);var kopen=false;function gCanvas(){return document.getElementById('canvas')||document.querySelector('canvas')}function gTargets(){var a=[],c=gCanvas();if(c)a.push(c);try{if(window.Module&&Module.canvas)a.push(Module.canvas)}catch(e){}a.push(document.body,document,window);return a}function focusC(){var c=gCanvas();try{if(c&&c.focus)c.focus({preventScroll:true})}catch(e){}}function fakeEv(type,key,code,kc,cc){var c=gCanvas()||document.body;return{type:type,key:key,code:code||'',keyCode:kc|0,which:kc|0,charCode:cc|0,bubbles:true,cancelable:true,defaultPrevented:false,isTrusted:true,target:c,currentTarget:c,srcElement:c,view:window,preventDefault:function(){this.defaultPrevented=true},stopPropagation:function(){},stopImmediatePropagation:function(){}}}function callJE(type,fake){var pools=[];try{if(typeof JSEvents!=='undefined')pools.push(JSEvents)}catch(e){}try{if(window.JSEvents)pools.push(window.JSEvents)}catch(e){}for(var p=0;p<pools.length;p++){var hs=pools[p].eventHandlers||[];for(var i=0;i<hs.length;i++){var h=hs[i],et=h.eventTypeString||'';if(et!==type)continue;var fn=h.handlerFunc||h.callbackFunc||h.handler;if(typeof fn==='function'){try{fn(fake)}catch(e){}try{fn(type,fake)}catch(e){}}}}}function fire(type,key,code,kc,cc){var fake=fakeEv(type,key,code,kc,cc);callJE(type,fake);var targets=gTargets();for(var i=0;i<targets.length;i++){var t=targets[i];try{var prop='on'+type;if(t&&typeof t[prop]==='function')t[prop](fake)}catch(e){}try{t.dispatchEvent(new KeyboardEvent(type,{key:key,code:code||'',keyCode:kc|0,which:kc|0,charCode:cc|0,bubbles:true,cancelable:true}))}catch(e){}}}function injChar(ch){var key=ch,code='',kc=ch.charCodeAt(0),cc=kc;if(ch===' '){code='Space';kc=32;cc=32}else if(ch>='a'&&ch<='z'){code='Key'+ch.toUpperCase();kc=ch.toUpperCase().charCodeAt(0)}else if(ch>='A'&&ch<='Z'){code='Key'+ch}else if(ch>='0'&&ch<='9'){code='Digit'+ch}fire('keydown',key,code,kc,cc);fire('keypress',key,code,cc,cc);fire('keyup',key,code,kc,0)}function injSpecial(n){var m={Backspace:['Backspace','Backspace',8],Enter:['Enter','Enter',13]};var x=m[n];if(!x)return;fire('keydown',x[0],x[1],x[2],0);if(n==='Enter')fire('keypress',x[0],x[1],x[2],x[2]);fire('keyup',x[0],x[1],x[2],0)}function setKB(on){kopen=!!on;gi.style.display=kopen?'block':'none';sb.style.display=kopen?'block':'none';kb.style.background=kopen?'rgba(110,194,110,.95)':'rgba(30,30,30,.9)';kb.style.color=kopen?'#183318':'#fff';if(kopen){setTimeout(function(){try{gi.focus()}catch(e){}},30)}else{try{gi.blur()}catch(e){}}}kb.onclick=function(e){e.preventDefault();e.stopPropagation();setKB(!kopen)};function sendText(){var t=gi.value||'';focusC();setTimeout(function(){if(t){for(var i=0;i<t.length;i++)injChar(t.charAt(i))}injSpecial('Enter');gi.value='';setTimeout(function(){try{gi.focus()}catch(e){}},80)},30)}sb.onclick=function(e){e.preventDefault();e.stopPropagation();sendText()};gi.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();sendText()}});
 function save(){try{localStorage.setItem(S,JSON.stringify(L));}catch(e){}}
 function apply(){var vw=innerWidth,vh=innerHeight;root.querySelectorAll('[data-t]').forEach(function(el){var id=el.getAttribute('data-t');var c=L[id];if(!c)return;var s=c.size||64;el.style.width=s+'px';el.style.height=s+'px';el.style.opacity=String(c.opacity!=null?c.opacity:.4);el.style.left=Math.max(0,c.x*vw-s/2)+'px';el.style.top=Math.max(0,c.y*vh-s/2)+'px';});}
 function kc(c){return({KeyW:87,KeyA:65,KeyS:83,KeyD:68,Space:32,ControlLeft:17,KeyR:82,ShiftLeft:16,Tab:9,KeyV:86})[c]||0;}
@@ -1259,7 +1259,7 @@ apply();window.addEventListener('resize',apply);save();
 
     function injectChar(ch) {
       const k = charToKey(ch);
-      focusGameCanvas();
+      // Do not focus canvas here — iOS closes the keyboard if we do mid-type.
       fireKey("keydown", k.key, k.code, k.keyCode, k.charCode);
       fireKey("keypress", k.key, k.code, k.charCode || k.keyCode, k.charCode || k.keyCode);
       fireKey("keyup", k.key, k.code, k.keyCode, 0);
@@ -1287,9 +1287,11 @@ apply();window.addEventListener('resize',apply);save();
       if (typingBusy) return;
       typingBusy = true;
       try {
+        focusGameCanvas();
+        await new Promise((r) => setTimeout(r, 30));
         for (const ch of str) {
           injectChar(ch);
-          await new Promise((r) => setTimeout(r, 40));
+          await new Promise((r) => setTimeout(r, 50));
         }
       } finally {
         typingBusy = false;
@@ -1342,17 +1344,15 @@ apply();window.addEventListener('resize',apply);save();
         const text = ghostType.value || "";
         if (!text) {
           injectSpecial("Enter");
+          setTimeout(() => { try { ghostType.focus(); } catch (err) {} }, 80);
           return;
         }
         await injectString(text);
         ghostType.value = "";
-        // Confirm with Enter for most profile UIs
         injectSpecial("Enter");
         setTimeout(() => {
-          try {
-            ghostType.focus();
-          } catch (e) {}
-        }, 50);
+          try { ghostType.focus(); } catch (err) {}
+        }, 80);
       });
       // show/hide with keyboard
       const obs = new MutationObserver(sync);
@@ -1372,62 +1372,39 @@ apply();window.addEventListener('resize',apply);save();
 
     if (ghostType) {
       ensureSendBtn();
+      // IMPORTANT (iOS): do NOT inject or focus the canvas while typing.
+      // That steals focus and dismisses the keyboard after one letter.
+      // Only inject when user taps Send / Enter.
       ghostType.addEventListener("keydown", (e) => {
-        if (e.key === "Backspace") {
-          injectSpecial("Backspace");
-          return;
-        }
         if (e.key === "Enter") {
           e.preventDefault();
           const text = ghostType.value || "";
-          if (text) {
-            injectString(text).then(() => {
-              ghostType.value = "";
-              injectSpecial("Enter");
-            });
-          } else {
+          const run = async () => {
+            if (text) await injectString(text);
+            ghostType.value = "";
             injectSpecial("Enter");
-          }
-          return;
+            // Refocus field so keyboard can stay up for another try
+            setTimeout(() => {
+              try { ghostType.focus(); } catch (err) {}
+            }, 100);
+          };
+          run();
         }
         if (e.key === "Escape") {
-          injectSpecial("Escape");
           setKeyboardOpen(false);
-          return;
         }
       });
-      // Live typing: each inserted character
-      ghostType.addEventListener("beforeinput", (e) => {
-        // Prefer beforeinput — has insertText data on mobile
-        if (e.inputType === "insertText" && e.data) {
-          injectChar(e.data);
-          // keep field empty so we only get deltas
-          // (don't preventDefault — mobile keyboards can break)
-        } else if (
-          e.inputType === "deleteContentBackward" ||
-          e.inputType === "deleteContentForward"
-        ) {
-          injectSpecial("Backspace");
-        }
-      });
-      ghostType.addEventListener("input", () => {
-        const val = ghostType.value;
-        if (!val) return;
-        // Fallback if beforeinput didn't fire
-        for (const ch of val) injectChar(ch);
-        ghostType.value = "";
-      });
+      // Don't auto-close keyboard on blur while Send is being pressed
       ghostType.addEventListener("blur", () => {
         setTimeout(() => {
+          const ae = document.activeElement;
           if (
             keyboardOpen &&
-            document.activeElement !== ghostType &&
-            document.activeElement !== document.getElementById("ghost-send")
+            ae !== ghostType &&
+            ae !== document.getElementById("ghost-send")
           ) {
-            keyboardOpen = false;
-            document.body.classList.remove("keyboard-open");
-            const b = document.getElementById("ghost-send");
-            if (b) b.style.display = "none";
+            // Keep the bar open; user can tap the field again
+            // Only hide if they tapped the keyboard FAB to close
           }
         }, 250);
       });
