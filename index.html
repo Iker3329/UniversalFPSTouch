@@ -423,11 +423,12 @@
         }
         window.__codTouchOverlay = 1;
 
-        var css = "#cod-tc{position:fixed;inset:0;z-index:2147483000;pointer-events:none;touch-action:none}" +
-          "#cod-tc .zone-r{position:absolute;right:0;top:0;bottom:0;width:50%;pointer-events:auto;touch-action:none;z-index:0}" +
-          "#cod-tc .b,#cod-tc .s{position:absolute;pointer-events:auto;touch-action:none;border:2px solid rgba(255,255,255,.45);" +
+        var css = "#cod-tc{position:fixed;inset:0;z-index:2147483000;pointer-events:auto;touch-action:none}" +
+          "#cod-tc .zone-l{position:absolute;left:0;top:0;bottom:0;width:50%;z-index:0}" +
+          "#cod-tc .zone-r{position:absolute;right:0;top:0;bottom:0;width:50%;z-index:0}" +
+          "#cod-tc .b,#cod-tc .s{position:absolute;z-index:2;border:2px solid rgba(255,255,255,.45);" +
           "background:rgba(20,20,20,.35);color:#fff;font:700 12px system-ui;display:flex;align-items:center;justify-content:center;" +
-          "text-align:center;border-radius:50%;text-shadow:0 1px 2px #000;z-index:1}" +
+          "text-align:center;border-radius:50%;text-shadow:0 1px 2px #000}" +
           "#cod-tc .s{width:140px;height:140px}" +
           "#cod-tc .k{position:absolute;left:50%;top:50%;width:56px;height:56px;margin:-28px 0 0 -28px;border-radius:50%;" +
           "background:rgba(255,255,255,.45);border:2px solid rgba(255,255,255,.75);pointer-events:none}" +
@@ -440,6 +441,7 @@
         var root = document.createElement("div");
         root.id = "cod-tc";
         root.innerHTML =
+          '<div class="zone-l" id="cod-zone-l"></div>' +
           '<div class="zone-r" id="cod-zone-r"></div>' +
           '<div class="s" data-t="stick"><div class="k" id="cod-k"></div></div>' +
           '<div class="b" data-t="fire">FIRE</div>' +
@@ -518,26 +520,103 @@
           } catch (e) {}
         }
         var lookCX = 0, lookCY = 0, lookInit = false;
+        function getCanvas() {
+          try {
+            if (window.Module && Module.canvas) return Module.canvas;
+          } catch (e) {}
+          return document.getElementById("canvas") || document.querySelector("canvas");
+        }
+        function callMouseHandlers(type, fake) {
+          var pools = [];
+          try { if (typeof JSEvents !== "undefined") pools.push(JSEvents); } catch (e) {}
+          try { if (window.JSEvents) pools.push(window.JSEvents); } catch (e) {}
+          for (var p = 0; p < pools.length; p++) {
+            var hs = pools[p].eventHandlers || [];
+            for (var i = 0; i < hs.length; i++) {
+              var h = hs[i];
+              var et = h.eventTypeString || h.eventTypeName || "";
+              if (et !== type && et !== "mousemove" && et !== "pointermove") continue;
+              if (type === "mousemove" && et !== "mousemove" && et !== "pointermove") continue;
+              var fn = h.handlerFunc || h.callbackFunc || h.handler;
+              if (typeof fn === "function") {
+                try { fn(fake); } catch (e) {}
+                try { fn(type, fake); } catch (e) {}
+              }
+            }
+          }
+        }
         function look(dx, dy) {
-          var canvas = document.getElementById("canvas") || document.querySelector("canvas");
+          var canvas = getCanvas();
           if (!canvas) return;
           if (!lookInit) {
             var r = canvas.getBoundingClientRect();
-            lookCX = r.left + r.width / 2;
-            lookCY = r.top + r.height / 2;
+            lookCX = r.left + r.width * 0.5;
+            lookCY = r.top + r.height * 0.5;
             lookInit = true;
           }
-          var sens = 2.8;
-          var mx = dx * sens, my = dy * sens;
+          var sens = 3.2;
+          var mx = dx * sens;
+          var my = dy * sens;
           lookCX += mx;
           lookCY += my;
-          var targets = [canvas, document, window];
+
+          // Update Emscripten Browser mouse deltas if present
           try {
-            if (window.Module && Module.canvas) targets.unshift(Module.canvas);
+            if (typeof Browser !== "undefined" && Browser) {
+              if ("mouseMovementX" in Browser) Browser.mouseMovementX = mx;
+              if ("mouseMovementY" in Browser) Browser.mouseMovementY = my;
+              if ("mouseX" in Browser) Browser.mouseX = lookCX;
+              if ("mouseY" in Browser) Browser.mouseY = lookCY;
+            }
           } catch (e) {}
+          try {
+            if (window.Module && Module.Browser) {
+              var B = Module.Browser;
+              if ("mouseMovementX" in B) B.mouseMovementX = mx;
+              if ("mouseMovementY" in B) B.mouseMovementY = my;
+            }
+          } catch (e) {}
+
+          var fake = {
+            type: "mousemove",
+            buttons: 0,
+            button: 0,
+            clientX: lookCX,
+            clientY: lookCY,
+            pageX: lookCX,
+            pageY: lookCY,
+            screenX: lookCX,
+            screenY: lookCY,
+            movementX: mx,
+            movementY: my,
+            mozMovementX: mx,
+            mozMovementY: my,
+            webkitMovementX: mx,
+            webkitMovementY: my,
+            ctrlKey: false,
+            shiftKey: false,
+            altKey: false,
+            metaKey: false,
+            bubbles: true,
+            cancelable: true,
+            target: canvas,
+            currentTarget: canvas,
+            srcElement: canvas,
+            view: window,
+            preventDefault: function () {},
+            stopPropagation: function () {},
+            stopImmediatePropagation: function () {}
+          };
+          callMouseHandlers("mousemove", fake);
+          callMouseHandlers("pointermove", fake);
+
+          var targets = [canvas, document, window];
           for (var i = 0; i < targets.length; i++) {
             var t = targets[i];
             if (!t) continue;
+            try {
+              if (typeof t.onmousemove === "function") t.onmousemove(fake);
+            } catch (e) {}
             try {
               var ev = new MouseEvent("mousemove", {
                 bubbles: true,
@@ -555,18 +634,6 @@
                 Object.defineProperty(ev, "movementY", { get: function () { return my; } });
               } catch (e2) {}
               t.dispatchEvent(ev);
-            } catch (e) {}
-            try {
-              t.dispatchEvent(new PointerEvent("pointermove", {
-                bubbles: true,
-                cancelable: true,
-                pointerId: 1,
-                pointerType: "touch",
-                clientX: lookCX,
-                clientY: lookCY,
-                movementX: mx,
-                movementY: my
-              }));
             } catch (e) {}
           }
         }
@@ -617,7 +684,7 @@
           stickTo(dx, dy);
         }
 
-        root.addEventListener("touchstart", function (ev) {
+        function onTouchStart(ev) {
           for (var i = 0; i < ev.changedTouches.length; i++) {
             var t = ev.changedTouches[i], x = t.clientX, y = t.clientY;
             var c = hit(x, y), half = innerWidth / 2;
@@ -630,29 +697,40 @@
             } else if (x < half) {
               var r = stick.getBoundingClientRect();
               var cx = r.left + r.width / 2, cy = r.top + r.height / 2;
-              if (Math.hypot(x - cx, y - cy) < Math.max(r.width, 120)) {
+              if (Math.hypot(x - cx, y - cy) < Math.max(r.width, 160)) {
                 sid = t.identifier; ms(x, y); ev.preventDefault();
+              } else {
+                // absorb left empty taps so they don't click the game
+                ev.preventDefault();
               }
-            } else if (x >= half) {
+            } else {
+              // Right half trackpad
               lt[t.identifier] = { x: x, y: y };
               ev.preventDefault();
             }
           }
-        }, { passive: false });
-
-        window.addEventListener("touchmove", function (ev) {
+        }
+        function onTouchMove(ev) {
+          var moved = false;
           for (var i = 0; i < ev.changedTouches.length; i++) {
             var t = ev.changedTouches[i];
             if (t.identifier === sid) {
-              ms(t.clientX, t.clientY); ev.preventDefault();
+              ms(t.clientX, t.clientY); moved = true;
             } else if (lt[t.identifier]) {
               var p = lt[t.identifier];
-              look(t.clientX - p.x, t.clientY - p.y);
+              var ddx = t.clientX - p.x;
+              var ddy = t.clientY - p.y;
+              if (ddx !== 0 || ddy !== 0) look(ddx, ddy);
               lt[t.identifier] = { x: t.clientX, y: t.clientY };
-              ev.preventDefault();
+              moved = true;
             }
           }
-        }, { passive: false });
+          if (moved) ev.preventDefault();
+        }
+        root.addEventListener("touchstart", onTouchStart, { passive: false, capture: true });
+        root.addEventListener("touchmove", onTouchMove, { passive: false, capture: true });
+        window.addEventListener("touchstart", onTouchStart, { passive: false, capture: true });
+        window.addEventListener("touchmove", onTouchMove, { passive: false, capture: true });
 
         function endTouch(ev) {
           for (var i = 0; i < ev.changedTouches.length; i++) {
