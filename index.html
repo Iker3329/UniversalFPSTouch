@@ -462,16 +462,28 @@
         var tb = document.createElement("button");
         tb.textContent = "Hide pads";
         tb.setAttribute("type", "button");
-        tb.style.cssText = "position:fixed;left:10px;top:10px;z-index:2147483001;padding:8px 12px;border:0;border-radius:20px;background:rgba(30,30,30,.9);color:#fff;font:700 13px system-ui;";
+        tb.style.cssText = "position:fixed;left:10px;top:10px;z-index:2147483646;padding:8px 12px;border:0;border-radius:20px;background:rgba(30,30,30,.9);color:#fff;font:700 13px system-ui;";
         document.documentElement.appendChild(tb);
         var hid = false;
-        tb.onclick = function () {
-          hid = !hid;
+        function setHidden(next) {
+          hid = !!next;
           root.style.display = hid ? "none" : "block";
+          // When hidden, do not block the page
+          root.style.pointerEvents = hid ? "none" : "auto";
           tb.textContent = hid ? "Show pads" : "Hide pads";
           tb.style.background = hid ? "rgba(110,194,110,.9)" : "rgba(30,30,30,.9)";
           tb.style.color = hid ? "#183318" : "#fff";
-        };
+        }
+        tb.addEventListener("click", function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          setHidden(!hid);
+        });
+        tb.addEventListener("touchend", function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          setHidden(!hid);
+        }, { passive: false });
 
         function apply() {
           var vw = innerWidth, vh = innerHeight;
@@ -706,9 +718,24 @@
           stickTo(dx, dy);
         }
 
+        function isHudButton(el) {
+          var n = el;
+          while (n) {
+            if (n === tb) return true;
+            n = n.parentNode;
+          }
+          return false;
+        }
         function onTouchStart(ev) {
+          // When pads hidden, let the game receive all touches
+          if (hid) return;
+          // Don't steal taps meant for Hide/Show pads
+          if (isHudButton(ev.target)) return;
           for (var i = 0; i < ev.changedTouches.length; i++) {
             var t = ev.changedTouches[i], x = t.clientX, y = t.clientY;
+            // Also ignore if finger is on the HUD button rect
+            var br = tb.getBoundingClientRect();
+            if (x >= br.left && x <= br.right && y >= br.top && y <= br.bottom) return;
             var c = hit(x, y), half = innerWidth / 2;
             if (c === "stick") {
               sid = t.identifier; ms(x, y); ev.preventDefault();
@@ -722,17 +749,17 @@
               if (Math.hypot(x - cx, y - cy) < Math.max(r.width, 160)) {
                 sid = t.identifier; ms(x, y); ev.preventDefault();
               } else {
-                // absorb left empty taps so they don't click the game
                 ev.preventDefault();
               }
             } else {
-              // Right half trackpad
               lt[t.identifier] = { x: x, y: y };
               ev.preventDefault();
             }
           }
         }
         function onTouchMove(ev) {
+          if (hid) return;
+          if (isHudButton(ev.target)) return;
           var moved = false;
           for (var i = 0; i < ev.changedTouches.length; i++) {
             var t = ev.changedTouches[i];
