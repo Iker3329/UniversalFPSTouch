@@ -938,7 +938,7 @@ var css='#cod-tc{position:fixed;inset:0;z-index:2147483000;pointer-events:none;t
 var st=document.createElement('style');st.textContent=css;document.documentElement.appendChild(st);
 var root=document.createElement('div');root.id='cod-tc';
 root.innerHTML='<div class="s" data-t="stick"><div class="k" id="cod-k"></div></div><div class="b" data-t="fire">FIRE</div><div class="b" data-t="ads">ADS</div><div class="b" data-t="reload">RLD</div><div class="b" data-t="jump">JUMP</div><div class="b" data-t="stance">STANCE</div><div class="b" data-t="stats">STATS</div>';
-document.documentElement.appendChild(root);var tb=document.createElement('button');tb.textContent='Hide pads';tb.style.cssText='position:fixed;left:10px;top:10px;z-index:2147483001;padding:8px 12px;border:0;border-radius:20px;background:rgba(30,30,30,.9);color:#fff;font:700 13px system-ui';document.documentElement.appendChild(tb);var hid=false;tb.onclick=function(){hid=!hid;root.style.display=hid?'none':'block';tb.textContent=hid?'Show pads':'Hide pads';tb.style.background=hid?'rgba(110,194,110,.9)':'rgba(30,30,30,.9)';tb.style.color=hid?'#183318':'#fff';};var kb=document.createElement('button');kb.textContent='\u2328';kb.title='Keyboard';kb.style.cssText='position:fixed;left:10px;bottom:10px;z-index:2147483001;width:48px;height:48px;border:0;border-radius:50%;background:rgba(30,30,30,.9);color:#fff;font:22px system-ui';document.documentElement.appendChild(kb);var gi=document.createElement('input');gi.type='text';gi.autocomplete='off';gi.spellcheck=false;gi.placeholder='Type name, then Send';gi.style.cssText='position:fixed;left:0;right:72px;bottom:0;z-index:2147483002;padding:12px 14px;font-size:16px;border:0;border-top:1px solid #444;background:rgba(16,14,20,.96);color:#fff;display:none;box-sizing:border-box';document.documentElement.appendChild(gi);var sb=document.createElement('button');sb.textContent='Send';sb.style.cssText='position:fixed;right:8px;bottom:8px;z-index:2147483003;padding:10px 14px;border:0;border-radius:8px;background:#6ec26e;color:#183318;font:700 15px system-ui;display:none';document.documentElement.appendChild(sb);var kopen=false;function gTargets(){var a=[],c=document.getElementById('canvas')||document.querySelector('canvas');if(c)a.push(c);try{if(window.Module&&Module.canvas)a.push(Module.canvas)}catch(e){}a.push(document.body,document,window);return a}function focusC(){var c=document.getElementById('canvas')||document.querySelector('canvas');try{if(c&&c.focus)c.focus({preventScroll:true})}catch(e){}}function fire(type,key,code,kc,cc){var targets=gTargets();for(var i=0;i<targets.length;i++){try{var ev=new KeyboardEvent(type,{key:key,code:code||'',keyCode:kc|0,which:kc|0,charCode:cc|0,bubbles:true,cancelable:true,composed:true});targets[i].dispatchEvent(ev)}catch(e){}}}function injChar(ch){var key=ch,code='',kc=ch.charCodeAt(0),cc=kc;if(ch===' '){code='Space';kc=32;cc=32}else if(ch>='a'&&ch<='z'){code='Key'+ch.toUpperCase();kc=ch.toUpperCase().charCodeAt(0)}else if(ch>='A'&&ch<='Z'){code='Key'+ch}else if(ch>='0'&&ch<='9'){code='Digit'+ch}focusC();fire('keydown',key,code,kc,cc);fire('keypress',key,code,cc,cc);fire('keyup',key,code,kc,0)}function injSpecial(n){var m={Backspace:['Backspace','Backspace',8],Enter:['Enter','Enter',13]};var x=m[n];if(!x)return;focusC();fire('keydown',x[0],x[1],x[2],0);if(n==='Enter')fire('keypress',x[0],x[1],x[2],x[2]);fire('keyup',x[0],x[1],x[2],0)}function setKB(on){kopen=!!on;gi.style.display=kopen?'block':'none';sb.style.display=kopen?'block':'none';kb.style.background=kopen?'rgba(110,194,110,.95)':'rgba(30,30,30,.9)';kb.style.color=kopen?'#183318':'#fff';if(kopen){gi.value='';setTimeout(function(){try{gi.focus()}catch(e){}},50)}else{try{gi.blur()}catch(e){}}}kb.onclick=function(e){e.preventDefault();e.stopPropagation();setKB(!kopen)};sb.onclick=function(e){e.preventDefault();e.stopPropagation();var t=gi.value||'';if(t){for(var i=0;i<t.length;i++)injChar(t[i]);gi.value=''}injSpecial('Enter');setTimeout(function(){try{gi.focus()}catch(e){}},50)};gi.addEventListener('keydown',function(e){if(e.key==='Backspace')injSpecial('Backspace');if(e.key==='Enter'){e.preventDefault();var t=gi.value||'';if(t){for(var i=0;i<t.length;i++)injChar(t[i]);gi.value=''}injSpecial('Enter')}});gi.addEventListener('beforeinput',function(e){if(e.inputType==='insertText'&&e.data)injChar(e.data);else if(e.inputType==='deleteContentBackward')injSpecial('Backspace')});gi.addEventListener('input',function(){var v=gi.value;if(!v)return;for(var i=0;i<v.length;i++)injChar(v[i]);gi.value=''});
+document.documentElement.appendChild(root);var tb=document.createElement('button');tb.textContent='Hide pads';tb.style.cssText='position:fixed;left:10px;top:10px;z-index:2147483001;padding:8px 12px;border:0;border-radius:20px;background:rgba(30,30,30,.9);color:#fff;font:700 13px system-ui';document.documentElement.appendChild(tb);var hid=false;tb.onclick=function(){hid=!hid;root.style.display=hid?'none':'block';tb.textContent=hid?'Show pads':'Hide pads';tb.style.background=hid?'rgba(110,194,110,.9)':'rgba(30,30,30,.9)';tb.style.color=hid?'#183318':'#fff';};var kb=document.createElement('button');kb.textContent='\u2328';kb.title='Keyboard';kb.style.cssText='position:fixed;left:10px;bottom:10px;z-index:2147483001;width:48px;height:48px;border:0;border-radius:50%;background:rgba(30,30,30,.9);color:#fff;font:22px system-ui';document.documentElement.appendChild(kb);var gi=document.createElement('input');gi.type='text';gi.autocomplete='off';gi.spellcheck=false;gi.placeholder='Type name, then Send';gi.style.cssText='position:fixed;left:0;right:72px;bottom:0;z-index:2147483002;padding:12px 14px;font-size:16px;border:0;border-top:1px solid #444;background:rgba(16,14,20,.96);color:#fff;display:none;box-sizing:border-box';document.documentElement.appendChild(gi);var sb=document.createElement('button');sb.textContent='Send';sb.style.cssText='position:fixed;right:8px;bottom:8px;z-index:2147483003;padding:10px 14px;border:0;border-radius:8px;background:#6ec26e;color:#183318;font:700 15px system-ui;display:none';document.documentElement.appendChild(sb);var kopen=false;function gCanvas(){return document.getElementById('canvas')||document.querySelector('canvas')}function gTargets(){var a=[],c=gCanvas();if(c)a.push(c);try{if(window.Module&&Module.canvas)a.push(Module.canvas)}catch(e){}a.push(document.body,document,window);return a}function focusC(){var c=gCanvas();try{if(c&&c.focus)c.focus({preventScroll:true})}catch(e){}}function fakeEv(type,key,code,kc,cc){var c=gCanvas()||document.body;return{type:type,key:key,code:code||'',keyCode:kc|0,which:kc|0,charCode:cc|0,location:0,ctrlKey:false,shiftKey:false,altKey:false,metaKey:false,repeat:false,bubbles:true,cancelable:true,defaultPrevented:false,isTrusted:true,target:c,currentTarget:c,srcElement:c,view:window,preventDefault:function(){this.defaultPrevented=true},stopPropagation:function(){},stopImmediatePropagation:function(){}}}function callJE(type,fake){var pools=[];try{if(typeof JSEvents!=='undefined')pools.push(JSEvents)}catch(e){}try{if(window.JSEvents)pools.push(window.JSEvents)}catch(e){}for(var p=0;p<pools.length;p++){var hs=pools[p].eventHandlers||[];for(var i=0;i<hs.length;i++){var h=hs[i],et=h.eventTypeString||h.eventTypeName||'';if(et!==type)continue;var fn=h.handlerFunc||h.callbackFunc||h.handler;if(typeof fn==='function'){try{fn(fake)}catch(e){}try{fn(type,fake)}catch(e){}}}}}function fire(type,key,code,kc,cc){var fake=fakeEv(type,key,code,kc,cc);callJE(type,fake);var targets=gTargets();for(var i=0;i<targets.length;i++){var t=targets[i];try{var prop='on'+type;if(t&&typeof t[prop]==='function')t[prop](fake)}catch(e){}try{var ev=new KeyboardEvent(type,{key:key,code:code||'',keyCode:kc|0,which:kc|0,charCode:cc|0,bubbles:true,cancelable:true});t.dispatchEvent(ev)}catch(e){}try{var ge=document.createEvent('Event');ge.initEvent(type,true,true);try{ge.keyCode=kc|0;ge.which=kc|0;ge.charCode=cc|0;ge.key=key}catch(e){}t.dispatchEvent(ge)}catch(e){}}}function injChar(ch){var key=ch,code='',kc=ch.charCodeAt(0),cc=kc;if(ch===' '){code='Space';kc=32;cc=32}else if(ch>='a'&&ch<='z'){code='Key'+ch.toUpperCase();kc=ch.toUpperCase().charCodeAt(0)}else if(ch>='A'&&ch<='Z'){code='Key'+ch}else if(ch>='0'&&ch<='9'){code='Digit'+ch}focusC();fire('keydown',key,code,kc,cc);fire('keypress',key,code,cc,cc);fire('keyup',key,code,kc,0)}function injSpecial(n){var m={Backspace:['Backspace','Backspace',8],Enter:['Enter','Enter',13]};var x=m[n];if(!x)return;focusC();fire('keydown',x[0],x[1],x[2],0);if(n==='Enter')fire('keypress',x[0],x[1],x[2],x[2]);fire('keyup',x[0],x[1],x[2],0)}function setKB(on){kopen=!!on;gi.style.display=kopen?'block':'none';sb.style.display=kopen?'block':'none';kb.style.background=kopen?'rgba(110,194,110,.95)':'rgba(30,30,30,.9)';kb.style.color=kopen?'#183318':'#fff';if(kopen){gi.value='';setTimeout(function(){try{gi.focus()}catch(e){}},50)}else{try{gi.blur()}catch(e){}}}kb.onclick=function(e){e.preventDefault();e.stopPropagation();setKB(!kopen)};function sendText(){var t=gi.value||'';if(t){for(var i=0;i<t.length;i++)injChar(t[i]);gi.value=''}injSpecial('Enter');setTimeout(function(){try{gi.focus()}catch(e){}},50)}sb.onclick=function(e){e.preventDefault();e.stopPropagation();sendText()};gi.addEventListener('keydown',function(e){if(e.key==='Backspace')injSpecial('Backspace');if(e.key==='Enter'){e.preventDefault();sendText()}});gi.addEventListener('beforeinput',function(e){if(e.inputType==='insertText'&&e.data){for(var i=0;i<e.data.length;i++)injChar(e.data.charAt(i))}else if(e.inputType==='deleteContentBackward')injSpecial('Backspace')});gi.addEventListener('input',function(){var v=gi.value;if(!v)return;for(var i=0;i<v.length;i++)injChar(v[i]);gi.value=''});
 function save(){try{localStorage.setItem(S,JSON.stringify(L));}catch(e){}}
 function apply(){var vw=innerWidth,vh=innerHeight;root.querySelectorAll('[data-t]').forEach(function(el){var id=el.getAttribute('data-t');var c=L[id];if(!c)return;var s=c.size||64;el.style.width=s+'px';el.style.height=s+'px';el.style.opacity=String(c.opacity!=null?c.opacity:.4);el.style.left=Math.max(0,c.x*vw-s/2)+'px';el.style.top=Math.max(0,c.y*vh-s/2)+'px';});}
 function kc(c){return({KeyW:87,KeyA:65,KeyS:83,KeyD:68,Space:32,ControlLeft:17,KeyR:82,ShiftLeft:16,Tab:9,KeyV:86})[c]||0;}
@@ -1000,6 +1000,7 @@ apply();window.addEventListener('resize',apply);save();
     let keyboardOpen = false;
     let typingBusy = false;
 
+
     function gameTargets() {
       const list = [];
       const seen = new Set();
@@ -1015,7 +1016,6 @@ apply();window.addEventListener('resize',apply);save();
             targetDoc.querySelector("canvas");
           add(c);
           add(targetDoc.body);
-          add(targetDoc.documentElement);
           add(targetDoc);
           if (targetWin) add(targetWin);
           try {
@@ -1032,7 +1032,6 @@ apply();window.addEventListener('resize',apply);save();
       try {
         if (window.Module && Module.canvas) add(Module.canvas);
       } catch (e) {}
-      add(document.activeElement);
       add(document.body);
       add(document);
       add(window);
@@ -1041,49 +1040,169 @@ apply();window.addEventListener('resize',apply);save();
 
     function focusGameCanvas() {
       try {
-        if (sameOrigin && targetDoc) {
-          const c =
-            targetDoc.getElementById("canvas") ||
-            targetDoc.querySelector("canvas");
-          if (c && c.focus) c.focus({ preventScroll: true });
-          if (targetWin) targetWin.focus();
-        }
-      } catch (e) {}
-      try {
         const c =
           document.getElementById("canvas") ||
           document.querySelector("canvas");
         if (c && c.focus) c.focus({ preventScroll: true });
       } catch (e) {}
+      try {
+        if (sameOrigin && targetDoc) {
+          const c =
+            targetDoc.getElementById("canvas") ||
+            targetDoc.querySelector("canvas");
+          if (c && c.focus) c.focus({ preventScroll: true });
+        }
+      } catch (e) {}
     }
 
-    function fireKey(type, key, code, keyCode, charCode) {
-      const init = {
+    // iOS WebKit: KeyboardEvent.keyCode is always 0 for synthetic events.
+    // SDL/Quake/COD read keyCode — so we also call Emscripten handlers with
+    // a plain object that has a real keyCode.
+    function makeFakeEvent(type, key, code, keyCode, charCode) {
+      const canvas =
+        document.getElementById("canvas") ||
+        document.querySelector("canvas") ||
+        document.body;
+      const ev = {
+        type: type,
         key: key,
         code: code || "",
         keyCode: keyCode | 0,
         which: keyCode | 0,
-        charCode: charCode != null ? charCode | 0 : (type === "keypress" ? keyCode | 0 : 0),
+        charCode: charCode | 0,
+        location: 0,
+        ctrlKey: false,
+        shiftKey: false,
+        altKey: false,
+        metaKey: false,
+        repeat: false,
         bubbles: true,
         cancelable: true,
         composed: true,
-        view: window
+        defaultPrevented: false,
+        isTrusted: true,
+        target: canvas,
+        currentTarget: canvas,
+        srcElement: canvas,
+        view: window,
+        timeStamp: Date.now(),
+        preventDefault: function () {
+          this.defaultPrevented = true;
+        },
+        stopPropagation: function () {},
+        stopImmediatePropagation: function () {}
       };
+      return ev;
+    }
+
+    function invokeEmscriptenHandlers(type, fake) {
+      const pools = [];
+      try {
+        if (typeof JSEvents !== "undefined") pools.push(JSEvents);
+      } catch (e) {}
+      try {
+        if (window.JSEvents) pools.push(window.JSEvents);
+      } catch (e) {}
+      try {
+        if (window.Module && Module.JSEvents) pools.push(Module.JSEvents);
+      } catch (e) {}
+      for (const JE of pools) {
+        const handlers = JE.eventHandlers || JE.handlers || [];
+        for (const h of handlers) {
+          const et =
+            h.eventTypeString ||
+            h.eventTypeName ||
+            h.type ||
+            "";
+          if (et !== type && et !== "keypress") continue;
+          if (type === "keypress" && et !== "keypress") continue;
+          if (type !== "keypress" && et === "keypress") continue;
+          const fn =
+            h.handlerFunc ||
+            h.callbackFunc ||
+            h.handler ||
+            h.callback;
+          if (typeof fn === "function") {
+            try {
+              fn(fake);
+            } catch (e) {}
+          }
+          // Some builds store eventTypeString only on keydown and branch inside
+          if (typeof fn === "function" && (type === "keydown" || type === "keyup")) {
+            try {
+              fn(type, fake);
+            } catch (e) {}
+          }
+        }
+      }
+      // Direct Module hooks used by some ports
+      try {
+        if (typeof window.Browser !== "undefined" && Browser.moduleContext) {
+          /* no-op probe */
+        }
+      } catch (e) {}
+    }
+
+    function fireKey(type, key, code, keyCode, charCode) {
+      const kc = keyCode | 0;
+      const cc =
+        charCode != null
+          ? charCode | 0
+          : type === "keypress"
+            ? kc
+            : 0;
+      const fake = makeFakeEvent(type, key, code, kc, cc);
+
+      // 1) Emscripten internal handlers (works when DOM keyCode is ignored)
+      invokeEmscriptenHandlers(type, fake);
+
+      // 2) on* properties
       for (const t of gameTargets()) {
         try {
+          const prop = "on" + type;
+          if (t && typeof t[prop] === "function") {
+            try {
+              t[prop](fake);
+            } catch (e) {}
+          }
+        } catch (e) {}
+      }
+
+      // 3) Normal dispatch (desktop / some Android)
+      for (const t of gameTargets()) {
+        try {
+          const init = {
+            key: key,
+            code: code || "",
+            keyCode: kc,
+            which: kc,
+            charCode: cc,
+            bubbles: true,
+            cancelable: true,
+            composed: true,
+            view: window
+          };
           const ev = new KeyboardEvent(type, init);
-          // Legacy readers (SDL / older engines)
           try {
-            Object.defineProperty(ev, "keyCode", { get: () => keyCode | 0 });
-            Object.defineProperty(ev, "which", { get: () => keyCode | 0 });
-            Object.defineProperty(ev, "charCode", {
-              get: () =>
-                charCode != null
-                  ? charCode | 0
-                  : type === "keypress"
-                    ? keyCode | 0
-                    : 0
-            });
+            Object.defineProperty(ev, "keyCode", { get: () => kc });
+            Object.defineProperty(ev, "which", { get: () => kc });
+            Object.defineProperty(ev, "charCode", { get: () => cc });
+          } catch (e) {}
+          t.dispatchEvent(ev);
+        } catch (e) {}
+      }
+
+      // 4) Generic Event with mutable fields (legacy WebKit path)
+      for (const t of gameTargets()) {
+        try {
+          const ev = document.createEvent("Event");
+          ev.initEvent(type, true, true);
+          try {
+            ev.key = key;
+            ev.code = code || "";
+            ev.keyCode = kc;
+            ev.which = kc;
+            ev.charCode = cc;
           } catch (e) {}
           t.dispatchEvent(ev);
         } catch (e) {}
@@ -1098,7 +1217,12 @@ apply();window.addEventListener('resize',apply);save();
         return { key: " ", code: "Space", keyCode: 32, charCode: 32 };
       }
       if (ch === "\b") {
-        return { key: "Backspace", code: "Backspace", keyCode: 8, charCode: 8 };
+        return {
+          key: "Backspace",
+          code: "Backspace",
+          keyCode: 8,
+          charCode: 8
+        };
       }
       const codePt = ch.charCodeAt(0);
       if (ch.length === 1 && ch >= "a" && ch <= "z") {
@@ -1125,7 +1249,6 @@ apply();window.addEventListener('resize',apply);save();
           charCode: codePt
         };
       }
-      // symbols — still send with charCode
       return {
         key: ch,
         code: "",
@@ -1166,7 +1289,7 @@ apply();window.addEventListener('resize',apply);save();
       try {
         for (const ch of str) {
           injectChar(ch);
-          await new Promise((r) => setTimeout(r, 30));
+          await new Promise((r) => setTimeout(r, 40));
         }
       } finally {
         typingBusy = false;
