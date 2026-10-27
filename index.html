@@ -3,348 +3,163 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-  <title>Universal FPS Webport Touch Overlay</title>
+  <title>Touch Controls Layout</title>
   <style>
     * { box-sizing: border-box; }
     html, body {
       margin: 0; padding: 0;
       width: 100%; height: 100%;
       overflow: hidden;
-      background: #0a0a0c;
+      background: #0c0c10;
       font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
       color: #e8e8e8;
-      touch-action: none;
-    }
-
-    #bar {
-      position: fixed;
-      left: 0; right: 0; top: 0;
-      z-index: 100;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      align-items: center;
-      padding: 8px;
-      background: rgba(16, 14, 20, 0.96);
-      border-bottom: 1px solid #333;
-    }
-    #bar input[type="url"], #bar input[type="text"] {
-      flex: 1 1 180px;
-      min-width: 120px;
-      padding: 10px 12px;
-      font-size: 16px;
-      border: 1px solid #444;
-      border-radius: 6px;
-      background: #1a1a1e;
-      color: #fff;
-    }
-    #bar button {
-      padding: 10px 12px;
-      min-height: 42px;
-      border: 0;
-      border-radius: 6px;
-      background: #6ec26e;
-      color: #183318;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      white-space: nowrap;
-    }
-    #bar button.secondary { background: #333; color: #ddd; }
-    #bar button.danger { background: #5a2222; color: #fcc; }
-    #bar.collapsed {
-      transform: translateY(-100%);
-      opacity: 0;
-      pointer-events: none;
-      transition: 0.2s;
-    }
-    #bar { transition: 0.2s; }
-
-    #frame-wrap {
-      position: fixed;
-      inset: 0;
-      top: 0;
-      background: #000;
-    }
-    #frame-wrap.with-bar { top: 56px; }
-    iframe#game {
-      width: 100%;
-      height: 100%;
-      border: 0;
-      background: #000;
-      display: block;
-    }
-
-    #hint {
-      position: fixed;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%);
-      max-width: 22em;
-      text-align: center;
-      color: #aaa;
-      padding: 20px;
-      z-index: 5;
-      pointer-events: none;
-    }
-    #hint strong { color: #fff; }
-
-    #warn {
-      display: none;
-      position: fixed;
-      left: 8px; right: 8px; bottom: 8px;
-      z-index: 90;
-      background: rgba(80, 40, 10, 0.95);
-      border: 1px solid #c80;
-      color: #ffe8c0;
-      padding: 10px 12px;
-      border-radius: 8px;
-      font-size: 13px;
-      line-height: 1.35;
-    }
-    #warn code { color: #fff; }
-
-    /* Touch overlay */
-    #touch-controls {
-      display: none;
-      position: fixed;
-      inset: 0;
-      z-index: 40;
-      pointer-events: none;
       touch-action: none;
       user-select: none;
       -webkit-user-select: none;
     }
-    body.playing #touch-controls { display: block; }
-
-    .tc-zone {
-      position: absolute;
-      top: 0; bottom: 0;
-      pointer-events: auto;
-      touch-action: none;
+    #stage {
+      position: fixed;
+      inset: 0;
+      background:
+        linear-gradient(90deg, rgba(80,120,200,0.08) 0%, rgba(80,120,200,0.08) 50%, rgba(200,80,80,0.08) 50%, rgba(200,80,80,0.08) 100%),
+        #101018;
     }
-    #tc-zone-left { left: 0; width: 50%; }
-    #tc-zone-right { right: 0; width: 50%; }
-
-    .tc-btn, .tc-stick-base {
+    #stage::before {
+      content: "LEFT · move + buttons";
       position: absolute;
-      pointer-events: auto;
-      touch-action: none;
-      border: 2px solid rgba(255,255,255,0.45);
-      background: rgba(20,20,20,0.35);
-      color: #fff;
-      font-weight: 700;
+      left: 12px; top: 50%;
+      transform: translateY(-50%);
+      color: rgba(150,180,255,0.35);
       font-size: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      pointer-events: none;
+      writing-mode: vertical-rl;
+    }
+    #stage::after {
+      content: "RIGHT · look trackpad";
+      position: absolute;
+      right: 12px; top: 50%;
+      transform: translateY(-50%);
+      color: rgba(255,150,150,0.35);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      pointer-events: none;
+      writing-mode: vertical-rl;
+    }
+    #mid-line {
+      position: fixed;
+      left: 50%; top: 0; bottom: 0;
+      width: 1px;
+      background: rgba(255,255,255,0.12);
+      z-index: 15;
+      pointer-events: none;
+    }
+    #panel {
+      position: fixed;
+      left: 0; right: 0; top: 0;
+      z-index: 50;
+      background: rgba(14, 14, 20, 0.96);
+      border-bottom: 1px solid #333;
+      padding: 10px 12px 12px;
+      max-height: 42vh;
+      overflow: auto;
+      -webkit-overflow-scrolling: touch;
+      touch-action: pan-y;
+    }
+    #panel h1 { margin: 0 0 4px; font-size: 17px; text-align: center; }
+    #panel .hint {
+      margin: 0 auto 10px;
+      max-width: 28em;
       text-align: center;
-      text-shadow: 0 1px 2px #000;
-      -webkit-tap-highlight-color: transparent;
+      color: #999;
+      font-size: 12px;
+      line-height: 1.4;
+    }
+    #panel label { display: block; margin: 8px 0 4px; color: #bbb; font-size: 13px; }
+    #panel select, #panel input[type="range"] {
+      width: 100%; max-width: 420px; font-size: 16px;
+    }
+    #panel .row {
+      display: flex; flex-wrap: wrap; gap: 8px;
+      justify-content: center; margin-top: 12px;
+    }
+    #panel button {
+      padding: 10px 14px; min-height: 44px; border: 0; border-radius: 8px;
+      background: #6ec26e; color: #183318; font-weight: 700; font-size: 14px; cursor: pointer;
+    }
+    #panel button.secondary { background: #333; color: #ddd; }
+    #copy-status {
+      text-align: center; min-height: 1.2em; margin-top: 8px;
+      font-size: 13px; color: #8d8;
+    }
+    #copy-status.err { color: #f88; }
+    #fields { max-width: 420px; margin: 0 auto; }
+    #touch-controls {
+      position: fixed; inset: 0; z-index: 20; pointer-events: none;
+    }
+    .tc-btn, .tc-stick-base {
+      position: absolute; pointer-events: auto; touch-action: none;
+      border: 2px solid rgba(255,255,255,0.5);
+      background: rgba(20,20,20,0.4); color: #fff;
+      font-weight: 700; font-size: 12px;
+      display: flex; align-items: center; justify-content: center;
+      text-align: center; text-shadow: 0 1px 2px #000;
+      outline: 2px dashed rgba(255,220,80,0.85);
+      cursor: move; -webkit-tap-highlight-color: transparent;
     }
     .tc-btn {
-      border-radius: 50%;
-      width: 64px; height: 64px;
-      padding: 4px;
-      line-height: 1.1;
+      border-radius: 50%; width: 64px; height: 64px;
+      padding: 4px; line-height: 1.1;
     }
-    .tc-btn.active {
-      background: rgba(110,194,110,0.55);
-      border-color: rgba(180,255,180,0.9);
-    }
-    .tc-stick-base {
-      border-radius: 50%;
-      width: 140px; height: 140px;
-    }
+    .tc-stick-base { border-radius: 50%; width: 140px; height: 140px; }
     .tc-stick-knob {
-      position: absolute;
-      left: 50%; top: 50%;
-      width: 56px; height: 56px;
-      margin: -28px 0 0 -28px;
+      position: absolute; left: 50%; top: 50%;
+      width: 56px; height: 56px; margin: -28px 0 0 -28px;
       border-radius: 50%;
       background: rgba(255,255,255,0.45);
       border: 2px solid rgba(255,255,255,0.75);
       pointer-events: none;
     }
-
-    body.edit-mode .tc-btn,
-    body.edit-mode .tc-stick-base {
-      outline: 2px dashed rgba(255,220,80,0.95);
-    }
-
-    #fab-toggle {
-      position: fixed;
-      right: 10px;
-      top: 10px;
-      z-index: 110;
-      width: 42px; height: 42px;
-      border-radius: 50%;
-      border: 0;
-      background: rgba(30,30,30,0.85);
-      color: #fff;
-      font-size: 18px;
-      cursor: pointer;
-    }
-    body.bar-open #fab-toggle { top: 62px; }
-
-    #fab-controls {
-      position: fixed;
-      left: 10px;
-      top: 10px;
-      z-index: 110;
-      min-width: 42px;
-      height: 42px;
-      padding: 0 12px;
-      border-radius: 21px;
-      border: 0;
-      background: rgba(30,30,30,0.85);
-      color: #fff;
-      font-size: 13px;
-      font-weight: 700;
-      cursor: pointer;
-      white-space: nowrap;
-    }
-    body.bar-open #fab-controls { top: 62px; }
-    body.controls-hidden #touch-controls {
-      display: none !important;
-      pointer-events: none !important;
-    }
-    body.controls-hidden #fab-controls {
-      background: rgba(110, 194, 110, 0.9);
-      color: #183318;
-    }
-
-    #fab-keyboard {
-      position: fixed;
-      left: 10px;
-      bottom: 10px;
-      z-index: 110;
-      width: 48px;
-      height: 48px;
-      border-radius: 50%;
-      border: 0;
-      background: rgba(30,30,30,0.9);
-      color: #fff;
-      font-size: 22px;
-      line-height: 1;
-      cursor: pointer;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.4);
-    }
-    body.playing #fab-keyboard { display: flex; }
-    body.controls-hidden #fab-keyboard { display: flex; }
-    body.keyboard-open #fab-keyboard {
-      background: rgba(110, 194, 110, 0.95);
-      color: #183318;
-    }
-    #ghost-type {
-      position: fixed;
-      left: 0;
-      right: 72px;
-      bottom: 0;
-      z-index: 115;
-      width: auto;
-      max-width: none;
-      padding: 12px 14px;
-      font-size: 16px; /* prevents iOS zoom */
-      border: 0;
-      border-top: 1px solid #444;
-      background: rgba(16,14,20,0.96);
-      color: #fff;
-      display: none;
-      box-sizing: border-box;
-    }
-    #ghost-send {
-      display: none;
-    }
-    body.keyboard-open #ghost-send {
-      display: block !important;
-    }
-    body.keyboard-open #ghost-type {
-      display: block;
-    }
-
-
-
-    #editor {
-      display: none;
-      position: fixed;
-      inset: 0;
-      z-index: 120;
-      background: rgba(10,10,14,0.94);
-      overflow: auto;
-      padding: 16px;
-    }
-    body.show-editor #editor { display: block; }
-    #editor h2 { margin: 0 0 8px; text-align: center; }
-    #editor .hint { color: #999; font-size: 13px; text-align: center; margin: 0 auto 14px; max-width: 26em; }
-    #editor label { display: block; margin: 10px 0 4px; color: #bbb; font-size: 14px; }
-    #editor select, #editor input[type="range"] { width: 100%; max-width: 420px; font-size: 16px; }
-    #editor .row { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 16px; }
-    #editor button {
-      padding: 10px 14px; min-height: 44px; border: 0; border-radius: 6px;
-      background: #6ec26e; color: #183318; font-weight: 600; font-size: 15px;
-    }
-    #editor button.secondary { background: #333; color: #ddd; }
-
-    #bookmarklet-box {
-      margin-top: 18px;
-      padding: 12px;
-      background: #1a1a22;
-      border-radius: 8px;
-      border: 1px solid #333;
-      max-width: 520px;
-      margin-left: auto;
-      margin-right: auto;
-      font-size: 13px;
-      color: #ccc;
-    }
-    #bookmarklet-box a {
-      display: inline-block;
-      margin-top: 8px;
-      padding: 10px 12px;
-      background: #3a5a8a;
-      color: #fff;
-      text-decoration: none;
-      border-radius: 6px;
-      font-weight: 600;
+    .tc-btn.selected, .tc-stick-base.selected {
+      outline-color: #6ec26e;
+      border-color: rgba(180,255,180,0.9);
+      background: rgba(40,80,40,0.45);
     }
   </style>
 </head>
 <body>
+  <div id="stage"></div>
+  <div id="mid-line"></div>
 
-  <div id="bar">
-    <input id="url" type="url" placeholder="https://your-webport.example/" autocomplete="off" spellcheck="false">
-    <button type="button" id="btn-load">Load in frame</button>
-    <button type="button" id="btn-open">Open full page</button>
-    <button type="button" id="btn-edit" class="secondary">Layout</button>
-    <button type="button" id="btn-hide" class="secondary">Hide bar</button>
-  </div>
-
-  <button type="button" id="fab-controls" title="Hide or show touch controls">Hide pads</button>
-  <button type="button" id="fab-keyboard" title="Open phone keyboard" aria-label="Keyboard">⌨</button>
-  <input id="ghost-type" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Type here (profile name, etc.)">
-  <button type="button" id="fab-toggle" title="Show bar">☰</button>
-
-  <div id="hint">
-    <strong>Universal FPS webport touch overlay</strong><br><br>
-    Paste a webport URL.<br>
-    For games that use browser storage (OPFS), use
-    <strong>Open full page</strong> + the bookmarklet — not the iframe.<br>
-    Left half = move + buttons · Right half = look.
-  </div>
-
-  <div id="warn"></div>
-
-  <div id="frame-wrap" class="with-bar">
-    <iframe id="game" title="Game" allow="gamepad; fullscreen; autoplay; cross-origin-isolated" allowfullscreen></iframe>
+  <div id="panel">
+    <h1>Touch controls layout</h1>
+    <p class="hint">
+      Drag controls to place them. Use the sliders for size and opacity.
+      Then copy the bookmarklet and paste it as a browser bookmark URL.
+      Open a webport and tap the bookmark to inject the controls.
+    </p>
+    <div id="fields">
+      <label for="te-control">Selected control</label>
+      <select id="te-control"></select>
+      <label for="te-size">Size</label>
+      <input id="te-size" type="range" min="40" max="200" value="64">
+      <label for="te-opacity">Opacity</label>
+      <input id="te-opacity" type="range" min="15" max="100" value="40">
+      <label>
+        <input id="te-auto" type="checkbox" checked>
+        Auto-sprint when stick is pushed forward
+      </label>
+    </div>
+    <div class="row">
+      <button type="button" id="btn-copy">Copy COD Touch Controls bookmarklet</button>
+      <button type="button" id="btn-reset" class="secondary">Reset layout</button>
+    </div>
+    <div id="copy-status"></div>
   </div>
 
   <div id="touch-controls">
-    <div id="tc-zone-left" class="tc-zone"></div>
-    <div id="tc-zone-right" class="tc-zone"></div>
     <div id="tc-stick" class="tc-stick-base" data-tc="stick">
       <div class="tc-stick-knob" id="tc-stick-knob"></div>
     </div>
@@ -356,38 +171,11 @@
     <button type="button" class="tc-btn" data-tc="stats">STATS</button>
   </div>
 
-  <div id="editor">
-    <h2>Touch layout</h2>
-    <p class="hint">Drag controls on the screen after Preview. Size & opacity use the sliders.</p>
-    <div style="max-width:480px;margin:0 auto;">
-      <label for="te-control">Control</label>
-      <select id="te-control"></select>
-      <label for="te-size">Size</label>
-      <input id="te-size" type="range" min="40" max="200" value="64">
-      <label for="te-opacity">Opacity</label>
-      <input id="te-opacity" type="range" min="15" max="100" value="40">
-      <label><input id="te-auto" type="checkbox" checked> Auto-sprint when stick is forward</label>
-    </div>
-    <div class="row">
-      <button type="button" id="te-preview">Preview / drag</button>
-      <button type="button" id="te-reset" class="secondary">Reset</button>
-      <button type="button" id="te-done">Done</button>
-    </div>
-    <div id="bookmarklet-box">
-      <strong>Recommended for COD / OPFS webports</strong><br>
-      Iframes do not see your installed game files. Open the webport as a normal page, then use this bookmarklet so controls run <em>inside</em> that page (same storage, same multiplayer setup).
-      <br>
-      Drag to bookmarks → open webport → tap bookmark:
-      <br>
-      <a id="bookmarklet" href="#">COD Touch Controls</a>
-    </div>
-  </div>
-
   <script>
   (function () {
     "use strict";
 
-    const STORAGE = "cod_touch_overlay_layout_v1";
+    const STORAGE = "cod_touch_layout_editor_v2";
     const DEFAULTS = {
       autoForward: true,
       stick:  { x: 0.14, y: 0.72, size: 140, opacity: 0.4 },
@@ -395,8 +183,8 @@
       ads:    { x: 0.70, y: 0.72, size: 64,  opacity: 0.4 },
       reload: { x: 0.88, y: 0.52, size: 56,  opacity: 0.4 },
       jump:   { x: 0.78, y: 0.52, size: 60,  opacity: 0.4 },
-      stance: { x: 0.10, y: 0.52, size: 56,  opacity: 0.4 },
-      stats:  { x: 0.50, y: 0.08, size: 52,  opacity: 0.35 }
+      stance: { x: 0.10, y: 0.40, size: 56,  opacity: 0.4 },
+      stats:  { x: 0.50, y: 0.12, size: 52,  opacity: 0.35 }
     };
     const LABELS = {
       stick: "Joystick", fire: "Fire", ads: "ADS", reload: "Reload",
@@ -404,22 +192,16 @@
     };
 
     let layout = loadLayout();
-    let keysDown = Object.create(null);
-    let stickId = null, lookId = null, lookLast = null;
-    let editMode = false, dragEdit = null;
-    let sameOrigin = false;
-    let targetWin = null;
-    let targetDoc = null;
+    let drag = null;
 
-    const frame = document.getElementById("game");
-    const bar = document.getElementById("bar");
-    const urlInput = document.getElementById("url");
-    const warn = document.getElementById("warn");
-    const hint = document.getElementById("hint");
     const root = document.getElementById("touch-controls");
     const stickEl = document.getElementById("tc-stick");
     const knobEl = document.getElementById("tc-stick-knob");
-    const frameWrap = document.getElementById("frame-wrap");
+    const sel = document.getElementById("te-control");
+    const sizeEl = document.getElementById("te-size");
+    const opEl = document.getElementById("te-opacity");
+    const autoEl = document.getElementById("te-auto");
+    const statusEl = document.getElementById("copy-status");
 
     function loadLayout() {
       try {
@@ -428,195 +210,40 @@
         if (!p) return out;
         if (typeof p.autoForward === "boolean") out.autoForward = p.autoForward;
         for (const k of Object.keys(LABELS)) {
-          if (p[k] && typeof p[k] === "object") out[k] = Object.assign({}, DEFAULTS[k], p[k]);
+          if (p[k] && typeof p[k] === "object") {
+            out[k] = Object.assign({}, DEFAULTS[k], p[k]);
+          }
         }
         return out;
       } catch (e) {
         return JSON.parse(JSON.stringify(DEFAULTS));
       }
     }
+
     function saveLayout() {
+      layout.autoForward = !!autoEl.checked;
       try { localStorage.setItem(STORAGE, JSON.stringify(layout)); } catch (e) {}
     }
 
-    function resolveTargets() {
-      targetWin = null;
-      targetDoc = null;
-      sameOrigin = false;
-      try {
-        const w = frame.contentWindow;
-        const d = frame.contentDocument;
-        if (w && d) {
-          // Touching d.domain / d.body throws if cross-origin
-          void d.body;
-          targetWin = w;
-          targetDoc = d;
-          sameOrigin = true;
-        }
-      } catch (e) {
-        sameOrigin = false;
+    function fillSelect() {
+      sel.innerHTML = "";
+      for (const id of Object.keys(LABELS)) {
+        const o = document.createElement("option");
+        o.value = id;
+        o.textContent = LABELS[id];
+        sel.appendChild(o);
       }
     }
 
-    function showWarn(kind) {
-      // kind: false | "cross" | "storage"
-      if (!kind) {
-        warn.style.display = "none";
-        return;
-      }
-      warn.style.display = "block";
-      if (kind === "storage" || kind === "cross") {
-        warn.innerHTML =
-          "<strong>Iframe cannot use your installed game data</strong><br>" +
-          "Browsers isolate storage (OPFS) and often block input inside cross-site iframes. " +
-          "Your COD install lives on the <em>real</em> webport page, not in this frame.<br><br>" +
-          "<strong>Correct way:</strong><br>" +
-          "1) Press <em>Open full page</em> (or open the webport in its own tab)<br>" +
-          "2) Open <em>Layout</em> here → drag <em>COD Touch Controls</em> to your bookmarks<br>" +
-          "3) On the webport tab, tap that bookmark to inject touch controls<br>" +
-          "4) Use <em>Hide pads</em> when you need the main menu";
-      }
-    }
-
-    function keyCodeFor(code) {
-      const m = {
-        KeyW: 87, KeyA: 65, KeyS: 83, KeyD: 68, Space: 32,
-        ControlLeft: 17, KeyR: 82, ShiftLeft: 16, Tab: 9, KeyV: 86
-      };
-      return m[code] || 0;
-    }
-
-    function dispatchKey(code, key, down) {
-      const type = down ? "keydown" : "keyup";
-      if (down) {
-        if (keysDown[code]) return;
-        keysDown[code] = true;
-      } else {
-        if (!keysDown[code]) return;
-        delete keysDown[code];
-      }
-      const targets = [];
-      if (sameOrigin && targetDoc) {
-        const c = targetDoc.getElementById("canvas") || targetDoc.querySelector("canvas");
-        if (c) targets.push(c);
-        targets.push(targetDoc);
-        if (targetWin) targets.push(targetWin);
-      }
-      targets.push(window);
-      for (const t of targets) {
-        try {
-          const ev = new KeyboardEvent(type, {
-            key, code,
-            keyCode: keyCodeFor(code),
-            which: keyCodeFor(code),
-            bubbles: true,
-            cancelable: true,
-            view: targetWin || window
-          });
-          try {
-            Object.defineProperty(ev, "keyCode", { get: () => keyCodeFor(code) });
-            Object.defineProperty(ev, "which", { get: () => keyCodeFor(code) });
-          } catch (e) {}
-          t.dispatchEvent(ev);
-        } catch (e) {}
-      }
-    }
-
-    function mouseButton(down, button) {
-      const type = down ? "mousedown" : "mouseup";
-      const targets = [];
-      if (sameOrigin && targetDoc) {
-        const c = targetDoc.getElementById("canvas") || targetDoc.querySelector("canvas");
-        if (c) targets.push(c);
-        targets.push(targetDoc);
-      }
-      for (const t of targets) {
-        try {
-          t.dispatchEvent(new MouseEvent(type, {
-            bubbles: true, cancelable: true,
-            view: targetWin || window,
-            button,
-            buttons: down ? (button === 0 ? 1 : 2) : 0,
-            clientX: innerWidth * 0.75,
-            clientY: innerHeight * 0.5
-          }));
-        } catch (e) {}
-      }
-    }
-
-    function sendLook(dx, dy) {
-      const sens = 1.6;
-      const mx = dx * sens, my = dy * sens;
-      const targets = [];
-      if (sameOrigin && targetDoc) {
-        const c = targetDoc.getElementById("canvas") || targetDoc.querySelector("canvas");
-        if (c) targets.push(c);
-        targets.push(targetDoc);
-        if (targetWin) targets.push(targetWin);
-      }
-      for (const t of targets) {
-        try {
-          const ev = new MouseEvent("mousemove", {
-            bubbles: true, cancelable: true,
-            view: targetWin || window,
-            movementX: mx, movementY: my
-          });
-          try {
-            Object.defineProperty(ev, "movementX", { get: () => mx });
-            Object.defineProperty(ev, "movementY", { get: () => my });
-          } catch (e) {}
-          t.dispatchEvent(ev);
-        } catch (e) {}
-      }
-    }
-
-    function releaseAll() {
-      for (const code of Object.keys(keysDown)) {
-        if (code === "Space") dispatchKey("Space", " ", false);
-        else if (code === "ControlLeft") dispatchKey("ControlLeft", "Control", false);
-        else if (code === "ShiftLeft") dispatchKey("ShiftLeft", "Shift", false);
-        else if (code === "Tab") dispatchKey("Tab", "Tab", false);
-        else dispatchKey(code, code.replace("Key", "").toLowerCase(), false);
-      }
-      keysDown = Object.create(null);
-      setKnob(0, 0);
-    }
-
-    function setKnob(nx, ny) {
-      const size = layout.stick.size || 140;
-      const max = size * 0.33;
-      knobEl.style.transform = "translate(" + (nx * max) + "px," + (ny * max) + "px)";
-    }
-
-    function applyStick(nx, ny) {
-      const dead = 0.18;
-      const forward = -ny, right = nx;
-      const mag = Math.hypot(nx, ny);
-      setKnob(nx, ny);
-      dispatchKey("KeyW", "w", forward > dead);
-      dispatchKey("KeyS", "s", forward < -dead);
-      dispatchKey("KeyA", "a", right < -dead);
-      dispatchKey("KeyD", "d", right > dead);
-      dispatchKey("ShiftLeft", "Shift", !!(layout.autoForward && forward > dead && mag > 0.55));
-    }
-
-    function setActive(id, on) {
-      const el = root.querySelector('[data-tc="' + id + '"]');
-      if (el) el.classList.toggle("active", !!on);
-    }
-
-    function pressBtn(id, down) {
-      setActive(id, down);
-      if (id === "fire") { mouseButton(down, 0); return; }
-      if (id === "ads") {
-        mouseButton(down, 2);
-        dispatchKey("KeyV", "v", down);
-        return;
-      }
-      if (id === "reload") dispatchKey("KeyR", "r", down);
-      if (id === "jump") dispatchKey("Space", " ", down);
-      if (id === "stance") dispatchKey("ControlLeft", "Control", down);
-      if (id === "stats") dispatchKey("Tab", "Tab", down);
+    function syncSliders() {
+      const c = layout[sel.value];
+      if (!c) return;
+      sizeEl.value = String(c.size || 64);
+      opEl.value = String(Math.round((c.opacity != null ? c.opacity : 0.4) * 100));
+      autoEl.checked = !!layout.autoForward;
+      root.querySelectorAll("[data-tc]").forEach((el) => {
+        el.classList.toggle("selected", el.getAttribute("data-tc") === sel.value);
+      });
     }
 
     function applyLayout() {
@@ -645,773 +272,210 @@
 
     function hitControl(x, y) {
       const els = root.querySelectorAll("[data-tc]");
-      for (const el of els) {
+      for (let i = els.length - 1; i >= 0; i--) {
+        const el = els[i];
         const r = el.getBoundingClientRect();
-        if (x >= r.left && x <= r.right && y >= r.top && y <= r.bottom)
+        if (x >= r.left && x <= r.right && y >= r.top && y <= r.bottom) {
           return el.getAttribute("data-tc");
+        }
       }
       return null;
     }
 
-    const activeBtns = Object.create(null);
-
-    function onStart(ev) {
-      if (editMode) return;
-      if (!document.body.classList.contains("playing")) return;
-      for (const t of ev.changedTouches) {
-        const x = t.clientX, y = t.clientY;
-        const half = innerWidth / 2;
-        const ctrl = hitControl(x, y);
-        if (ctrl === "stick") {
-          stickId = t.identifier;
-          moveStick(x, y);
-          ev.preventDefault();
-          continue;
-        }
-        if (ctrl && ctrl !== "stick") {
-          activeBtns[t.identifier] = ctrl;
-          pressBtn(ctrl, true);
-          ev.preventDefault();
-          continue;
-        }
-        if (x < half) {
-          const sr = stickEl.getBoundingClientRect();
-          const cx = sr.left + sr.width / 2, cy = sr.top + sr.height / 2;
-          if (Math.hypot(x - cx, y - cy) < Math.max(sr.width, 120)) {
-            stickId = t.identifier;
-            moveStick(x, y);
-            ev.preventDefault();
-            continue;
-          }
-        }
-        if (x >= half && lookId === null) {
-          lookId = t.identifier;
-          lookLast = { x, y };
-          ev.preventDefault();
-        }
-      }
-    }
-    function moveStick(x, y) {
-      const r = stickEl.getBoundingClientRect();
-      let dx = (x - (r.left + r.width / 2)) / (r.width / 2);
-      let dy = (y - (r.top + r.height / 2)) / (r.height / 2);
-      const mag = Math.hypot(dx, dy);
-      if (mag > 1) { dx /= mag; dy /= mag; }
-      applyStick(dx, dy);
-    }
-    function onMove(ev) {
-      if (editMode) return;
-      for (const t of ev.changedTouches) {
-        if (t.identifier === stickId) {
-          moveStick(t.clientX, t.clientY);
-          ev.preventDefault();
-        } else if (t.identifier === lookId && lookLast) {
-          sendLook(t.clientX - lookLast.x, t.clientY - lookLast.y);
-          lookLast = { x: t.clientX, y: t.clientY };
-          ev.preventDefault();
-        }
-      }
-    }
-    function onEnd(ev) {
-      if (editMode) return;
-      for (const t of ev.changedTouches) {
-        if (t.identifier === stickId) {
-          stickId = null;
-          applyStick(0, 0);
-        }
-        if (t.identifier === lookId) {
-          lookId = null;
-          lookLast = null;
-        }
-        if (activeBtns[t.identifier]) {
-          pressBtn(activeBtns[t.identifier], false);
-          delete activeBtns[t.identifier];
-        }
-      }
-    }
-
-    root.addEventListener("touchstart", onStart, { passive: false });
-    window.addEventListener("touchmove", onMove, { passive: false });
-    window.addEventListener("touchend", onEnd, { passive: false });
-    window.addEventListener("touchcancel", onEnd, { passive: false });
-
-    // ---- Load URL ----
-    function normalizeUrl() {
-      let u = (urlInput.value || "").trim();
-      if (!u) return "";
-      if (!/^https?:\/\//i.test(u)) u = "https://" + u;
-      urlInput.value = u;
-      return u;
-    }
-
-    function loadUrl() {
-      const u = normalizeUrl();
-      if (!u) return;
-      hint.style.display = "none";
-      document.body.classList.add("playing");
-      frame.src = u;
-      releaseAll();
-      // Iframes almost never share the top-level OPFS install for webports.
-      // Always show guidance; refine after load if same-origin.
-      showWarn("storage");
-      frame.onload = function () {
-        resolveTargets();
-        // Same-origin iframe can share storage; cross-origin cannot.
-        showWarn(sameOrigin ? false : "cross");
-        if (sameOrigin) {
-          // Still tip: COI / service worker may require top-level
-          warn.style.display = "block";
-          warn.innerHTML =
-            "<strong>Same-origin iframe</strong> — storage may work, but many webports " +
-            "need a <em>top-level</em> page for multi-thread / COOP. " +
-            "If the game looks uninstalled or fails to boot, use <em>Open full page</em> + bookmarklet.";
-        }
-        applyLayout();
-      };
-      setTimeout(() => {
-        resolveTargets();
-        if (!sameOrigin && frame.src) showWarn("cross");
-      }, 800);
-    }
-
-    function openFullPage() {
-      const u = normalizeUrl();
-      if (!u) return;
-      // Remember URL for convenience
-      try { localStorage.setItem("cod_touch_last_url", u); } catch (e) {}
-      const w = window.open(u, "_blank");
-      // Show instructions on this page
-      hint.style.display = "none";
-      showWarn("storage");
-      warn.style.display = "block";
-      warn.innerHTML =
-        "<strong>Opened webport in a new tab</strong><br>" +
-        "That tab has your real OPFS install and multiplayer isolation.<br>" +
-        "1) Here: <em>Layout</em> → bookmark <em>COD Touch Controls</em><br>" +
-        "2) There: run the bookmarklet after the game UI is visible<br>" +
-        "3) <em>Hide pads</em> when using menus, <em>Show pads</em> to play";
-      if (!w) {
-        // Popup blocked — navigate this tab instead
-        warn.innerHTML +=
-          "<br><br>Popup blocked. <a href=\"" + u.replace(/"/g, "") +
-          "\" style=\"color:#9cf\">Tap here to open the webport in this tab</a>, " +
-          "then use the bookmarklet.";
-      }
-    }
-
-    document.getElementById("btn-load").onclick = loadUrl;
-    document.getElementById("btn-open").onclick = openFullPage;
-    urlInput.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") openFullPage();
-    });
-    try {
-      const last = localStorage.getItem("cod_touch_last_url");
-      if (last && !urlInput.value) urlInput.value = last;
-    } catch (e) {}
-
-    document.getElementById("btn-hide").onclick = () => {
-      bar.classList.add("collapsed");
-      frameWrap.classList.remove("with-bar");
-      document.body.classList.remove("bar-open");
-    };
-    document.getElementById("fab-toggle").onclick = () => {
-      bar.classList.toggle("collapsed");
-      const open = !bar.classList.contains("collapsed");
-      frameWrap.classList.toggle("with-bar", open);
-      document.body.classList.toggle("bar-open", open);
-    };
-    document.body.classList.add("bar-open");
-
-    // ---- Editor ----
-    const sel = document.getElementById("te-control");
-    const sizeEl = document.getElementById("te-size");
-    const opEl = document.getElementById("te-opacity");
-    const autoEl = document.getElementById("te-auto");
-
-    function fillSel() {
-      sel.innerHTML = "";
-      for (const id of Object.keys(LABELS)) {
-        const o = document.createElement("option");
-        o.value = id; o.textContent = LABELS[id];
-        sel.appendChild(o);
-      }
-    }
-    function syncSliders() {
-      const c = layout[sel.value];
-      if (!c) return;
-      sizeEl.value = String(c.size || 64);
-      opEl.value = String(Math.round((c.opacity != null ? c.opacity : 0.4) * 100));
-    }
-
-    document.getElementById("btn-edit").onclick = () => {
-      layout = loadLayout();
-      autoEl.checked = !!layout.autoForward;
-      fillSel();
-      syncSliders();
-      document.body.classList.add("show-editor");
-    };
-    document.getElementById("te-done").onclick = () => {
-      layout.autoForward = !!autoEl.checked;
-      saveLayout();
-      document.body.classList.remove("show-editor");
-      document.body.classList.remove("edit-mode");
-      editMode = false;
-      applyLayout();
-    };
-    document.getElementById("te-reset").onclick = () => {
-      layout = JSON.parse(JSON.stringify(DEFAULTS));
-      autoEl.checked = true;
-      fillSel();
-      syncSliders();
-      applyLayout();
-      saveLayout();
-    };
-    document.getElementById("te-preview").onclick = () => {
-      layout.autoForward = !!autoEl.checked;
-      saveLayout();
-      document.body.classList.remove("show-editor");
-      editMode = true;
-      document.body.classList.add("edit-mode");
-      document.body.classList.add("playing");
-      applyLayout();
-    };
-    sel.onchange = syncSliders;
-    sizeEl.oninput = () => {
-      layout[sel.value].size = parseInt(sizeEl.value, 10) || 64;
-      applyLayout();
-    };
-    opEl.oninput = () => {
-      layout[sel.value].opacity = (parseInt(opEl.value, 10) || 40) / 100;
-      applyLayout();
-    };
-
-    function editDown(ev) {
-      if (!editMode) return;
+    function pointerDown(ev) {
+      if (ev.target.closest && ev.target.closest("#panel")) return;
       const t = ev.changedTouches ? ev.changedTouches[0] : ev;
       const ctrl = hitControl(t.clientX, t.clientY);
       if (!ctrl) return;
-      dragEdit = { id: ctrl, ox: t.clientX, oy: t.clientY, bx: layout[ctrl].x, by: layout[ctrl].y };
+      drag = {
+        id: ctrl,
+        ox: t.clientX,
+        oy: t.clientY,
+        bx: layout[ctrl].x,
+        by: layout[ctrl].y
+      };
       sel.value = ctrl;
       syncSliders();
       ev.preventDefault();
     }
-    function editMove(ev) {
-      if (!editMode || !dragEdit) return;
+
+    function pointerMove(ev) {
+      if (!drag) return;
       const t = ev.changedTouches ? ev.changedTouches[0] : ev;
-      const dx = (t.clientX - dragEdit.ox) / (innerWidth || 1);
-      const dy = (t.clientY - dragEdit.oy) / (innerHeight || 1);
-      layout[dragEdit.id].x = Math.min(0.95, Math.max(0.05, dragEdit.bx + dx));
-      layout[dragEdit.id].y = Math.min(0.95, Math.max(0.05, dragEdit.by + dy));
+      const vw = innerWidth || 1, vh = innerHeight || 1;
+      const dx = (t.clientX - drag.ox) / vw;
+      const dy = (t.clientY - drag.oy) / vh;
+      layout[drag.id].x = Math.min(0.95, Math.max(0.05, drag.bx + dx));
+      layout[drag.id].y = Math.min(0.95, Math.max(0.05, drag.by + dy));
       applyLayout();
       ev.preventDefault();
     }
-    function editUp() {
-      if (dragEdit) { saveLayout(); dragEdit = null; }
+
+    function pointerUp() {
+      if (!drag) return;
+      saveLayout();
+      drag = null;
     }
-    root.addEventListener("touchstart", editDown, { passive: false });
-    window.addEventListener("touchmove", editMove, { passive: false });
-    window.addEventListener("touchend", editUp, { passive: false });
 
-    // Double-tap top center to exit edit
-    let lastTap = 0;
-    root.addEventListener("touchend", (ev) => {
-      if (!editMode) return;
-      const now = Date.now();
-      if (now - lastTap < 350) {
-        editMode = false;
-        document.body.classList.remove("edit-mode");
-        document.body.classList.add("show-editor");
-      }
-      lastTap = now;
+    root.addEventListener("touchstart", pointerDown, { passive: false });
+    window.addEventListener("touchmove", pointerMove, { passive: false });
+    window.addEventListener("touchend", pointerUp, { passive: false });
+    root.addEventListener("mousedown", pointerDown);
+    window.addEventListener("mousemove", (e) => {
+      if (!drag) return;
+      if (!e.buttons) { pointerUp(); return; }
+      pointerMove(e);
     });
+    window.addEventListener("mouseup", pointerUp);
 
-    // ---- Bookmarklet (injects into any page) ----
+    sel.addEventListener("change", syncSliders);
+    sizeEl.addEventListener("input", () => {
+      layout[sel.value].size = parseInt(sizeEl.value, 10) || 64;
+      applyLayout();
+      saveLayout();
+    });
+    opEl.addEventListener("input", () => {
+      layout[sel.value].opacity = (parseInt(opEl.value, 10) || 40) / 100;
+      applyLayout();
+      saveLayout();
+    });
+    autoEl.addEventListener("change", saveLayout);
+
+    document.getElementById("btn-reset").onclick = () => {
+      layout = JSON.parse(JSON.stringify(DEFAULTS));
+      autoEl.checked = true;
+      fillSelect();
+      syncSliders();
+      applyLayout();
+      saveLayout();
+      statusEl.textContent = "Layout reset.";
+      statusEl.className = "";
+    };
+
     function buildBookmarklet() {
-      const src = `
-(function(){
-if(window.__codTouchOverlay){alert('Touch controls already active');return;}
-window.__codTouchOverlay=1;
-var S='cod_touch_bm_v1';
-var D={autoForward:true,stick:{x:.14,y:.72,size:140,opacity:.4},fire:{x:.82,y:.7,size:78,opacity:.45},ads:{x:.7,y:.72,size:64,opacity:.4},reload:{x:.88,y:.52,size:56,opacity:.4},jump:{x:.78,y:.52,size:60,opacity:.4},stance:{x:.1,y:.52,size:56,opacity:.4},stats:{x:.5,y:.08,size:52,opacity:.35}};
-var L;try{L=Object.assign(JSON.parse(JSON.stringify(D)),JSON.parse(localStorage.getItem(S)||'{}'));}catch(e){L=JSON.parse(JSON.stringify(D));}
-var css='#cod-tc{position:fixed;inset:0;z-index:2147483000;pointer-events:none;touch-action:none}#cod-tc .b,#cod-tc .s{position:absolute;pointer-events:auto;touch-action:none;border:2px solid rgba(255,255,255,.45);background:rgba(20,20,20,.35);color:#fff;font:700 12px system-ui;display:flex;align-items:center;justify-content:center;text-align:center;border-radius:50%;text-shadow:0 1px 2px #000}#cod-tc .s{width:140px;height:140px}#cod-tc .k{position:absolute;left:50%;top:50%;width:56px;height:56px;margin:-28px 0 0 -28px;border-radius:50%;background:rgba(255,255,255,.45);border:2px solid rgba(255,255,255,.75);pointer-events:none}#cod-tc .b.active{background:rgba(110,194,110,.55)}';
-var st=document.createElement('style');st.textContent=css;document.documentElement.appendChild(st);
-var root=document.createElement('div');root.id='cod-tc';
-root.innerHTML='<div class="s" data-t="stick"><div class="k" id="cod-k"></div></div><div class="b" data-t="fire">FIRE</div><div class="b" data-t="ads">ADS</div><div class="b" data-t="reload">RLD</div><div class="b" data-t="jump">JUMP</div><div class="b" data-t="stance">STANCE</div><div class="b" data-t="stats">STATS</div>';
-document.documentElement.appendChild(root);var tb=document.createElement('button');tb.textContent='Hide pads';tb.style.cssText='position:fixed;left:10px;top:10px;z-index:2147483001;padding:8px 12px;border:0;border-radius:20px;background:rgba(30,30,30,.9);color:#fff;font:700 13px system-ui';document.documentElement.appendChild(tb);var hid=false;tb.onclick=function(){hid=!hid;root.style.display=hid?'none':'block';tb.textContent=hid?'Show pads':'Hide pads';tb.style.background=hid?'rgba(110,194,110,.9)':'rgba(30,30,30,.9)';tb.style.color=hid?'#183318':'#fff';};var kb=document.createElement('button');kb.textContent='\u2328';kb.title='Keyboard';kb.style.cssText='position:fixed;left:10px;bottom:10px;z-index:2147483001;width:48px;height:48px;border:0;border-radius:50%;background:rgba(30,30,30,.9);color:#fff;font:22px system-ui';document.documentElement.appendChild(kb);var gi=document.createElement('input');gi.type='text';gi.autocomplete='off';gi.spellcheck=false;gi.placeholder='Type full name, then Send';gi.style.cssText='position:fixed;left:0;right:72px;bottom:0;z-index:2147483002;padding:12px 14px;font-size:16px;border:0;border-top:1px solid #444;background:rgba(16,14,20,.96);color:#fff;display:none;box-sizing:border-box';document.documentElement.appendChild(gi);var sb=document.createElement('button');sb.textContent='Send';sb.style.cssText='position:fixed;right:8px;bottom:8px;z-index:2147483003;padding:10px 14px;border:0;border-radius:8px;background:#6ec26e;color:#183318;font:700 15px system-ui;display:none';document.documentElement.appendChild(sb);var kopen=false;function gCanvas(){return document.getElementById('canvas')||document.querySelector('canvas')}function gTargets(){var a=[],c=gCanvas();if(c)a.push(c);try{if(window.Module&&Module.canvas)a.push(Module.canvas)}catch(e){}a.push(document.body,document,window);return a}function focusC(){var c=gCanvas();try{if(c&&c.focus)c.focus({preventScroll:true})}catch(e){}}function fakeEv(type,key,code,kc,cc){var c=gCanvas()||document.body;return{type:type,key:key,code:code||'',keyCode:kc|0,which:kc|0,charCode:cc|0,bubbles:true,cancelable:true,defaultPrevented:false,isTrusted:true,target:c,currentTarget:c,srcElement:c,view:window,preventDefault:function(){this.defaultPrevented=true},stopPropagation:function(){},stopImmediatePropagation:function(){}}}function callJE(type,fake){var pools=[];try{if(typeof JSEvents!=='undefined')pools.push(JSEvents)}catch(e){}try{if(window.JSEvents)pools.push(window.JSEvents)}catch(e){}for(var p=0;p<pools.length;p++){var hs=pools[p].eventHandlers||[];for(var i=0;i<hs.length;i++){var h=hs[i],et=h.eventTypeString||'';if(et!==type)continue;var fn=h.handlerFunc||h.callbackFunc||h.handler;if(typeof fn==='function'){try{fn(fake)}catch(e){}try{fn(type,fake)}catch(e){}}}}}function fire(type,key,code,kc,cc){var fake=fakeEv(type,key,code,kc,cc);callJE(type,fake);var targets=gTargets();for(var i=0;i<targets.length;i++){var t=targets[i];try{var prop='on'+type;if(t&&typeof t[prop]==='function')t[prop](fake)}catch(e){}try{t.dispatchEvent(new KeyboardEvent(type,{key:key,code:code||'',keyCode:kc|0,which:kc|0,charCode:cc|0,bubbles:true,cancelable:true}))}catch(e){}}}function injChar(ch){var key=ch,code='',kc=ch.charCodeAt(0),cc=kc;if(ch===' '){code='Space';kc=32;cc=32}else if(ch>='a'&&ch<='z'){code='Key'+ch.toUpperCase();kc=ch.toUpperCase().charCodeAt(0)}else if(ch>='A'&&ch<='Z'){code='Key'+ch}else if(ch>='0'&&ch<='9'){code='Digit'+ch}fire('keydown',key,code,kc,cc);fire('keypress',key,code,cc,cc);fire('keyup',key,code,kc,0)}function injSpecial(n){var m={Backspace:['Backspace','Backspace',8],Enter:['Enter','Enter',13]};var x=m[n];if(!x)return;fire('keydown',x[0],x[1],x[2],0);if(n==='Enter')fire('keypress',x[0],x[1],x[2],x[2]);fire('keyup',x[0],x[1],x[2],0)}function setKB(on){kopen=!!on;gi.style.display=kopen?'block':'none';sb.style.display=kopen?'block':'none';kb.style.background=kopen?'rgba(110,194,110,.95)':'rgba(30,30,30,.9)';kb.style.color=kopen?'#183318':'#fff';if(kopen){setTimeout(function(){try{gi.focus()}catch(e){}},30)}else{try{gi.blur()}catch(e){}}}kb.onclick=function(e){e.preventDefault();e.stopPropagation();setKB(!kopen)};function sendText(){var t=gi.value||'';focusC();setTimeout(function(){if(t){for(var i=0;i<t.length;i++)injChar(t.charAt(i))}injSpecial('Enter');gi.value='';setTimeout(function(){try{gi.focus()}catch(e){}},80)},30)}sb.onclick=function(e){e.preventDefault();e.stopPropagation();sendText()};gi.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();sendText()}});
-function save(){try{localStorage.setItem(S,JSON.stringify(L));}catch(e){}}
-function apply(){var vw=innerWidth,vh=innerHeight;root.querySelectorAll('[data-t]').forEach(function(el){var id=el.getAttribute('data-t');var c=L[id];if(!c)return;var s=c.size||64;el.style.width=s+'px';el.style.height=s+'px';el.style.opacity=String(c.opacity!=null?c.opacity:.4);el.style.left=Math.max(0,c.x*vw-s/2)+'px';el.style.top=Math.max(0,c.y*vh-s/2)+'px';});}
-function kc(c){return({KeyW:87,KeyA:65,KeyS:83,KeyD:68,Space:32,ControlLeft:17,KeyR:82,ShiftLeft:16,Tab:9,KeyV:86})[c]||0;}
-var down={};
-function key(code,key,isDown){var type=isDown?'keydown':'keyup';if(isDown){if(down[code])return;down[code]=1;}else{if(!down[code])return;delete down[code];}
-var canvas=document.getElementById('canvas')||document.querySelector('canvas');
-var targets=[canvas,document,window].filter(Boolean);
-targets.forEach(function(t){try{var ev=new KeyboardEvent(type,{key:key,code:code,keyCode:kc(code),which:kc(code),bubbles:true,cancelable:true});t.dispatchEvent(ev);}catch(e){}});}
-function mouse(isDown,btn){var canvas=document.getElementById('canvas')||document.querySelector('canvas');if(!canvas)return;try{canvas.dispatchEvent(new MouseEvent(isDown?'mousedown':'mouseup',{bubbles:true,cancelable:true,button:btn,buttons:isDown?(btn===0?1:2):0,clientX:innerWidth*.75,clientY:innerHeight*.5}));}catch(e){}}
-function look(dx,dy){var canvas=document.getElementById('canvas')||document.querySelector('canvas');if(!canvas)return;var mx=dx*1.6,my=dy*1.6;try{var ev=new MouseEvent('mousemove',{bubbles:true,cancelable:true,movementX:mx,movementY:my});canvas.dispatchEvent(ev);}catch(e){}}
-var stick=root.querySelector('[data-t=stick]'),knob=document.getElementById('cod-k');
-function setKnob(nx,ny){var s=L.stick.size||140;knob.style.transform='translate('+(nx*s*.33)+'px,'+(ny*s*.33)+'px)';}
-function stickTo(nx,ny){var d=.18,f=-ny,r=nx,m=Math.hypot(nx,ny);setKnob(nx,ny);key('KeyW','w',f>d);key('KeyS','s',f<-d);key('KeyA','a',r<-d);key('KeyD','d',r>d);key('ShiftLeft','Shift',!!(L.autoForward&&f>d&&m>.55));}
-function press(id,on){var el=root.querySelector('[data-t="'+id+'"]');if(el)el.classList.toggle('active',!!on);if(id==='fire')mouse(on,0);else if(id==='ads'){mouse(on,2);key('KeyV','v',on);}else if(id==='reload')key('KeyR','r',on);else if(id==='jump')key('Space',' ',on);else if(id==='stance')key('ControlLeft','Control',on);else if(id==='stats')key('Tab','Tab',on);}
-var sid=null,lid=null,ll=null,ab={};
-function hit(x,y){var n=root.querySelectorAll('[data-t]');for(var i=0;i<n.length;i++){var r=n[i].getBoundingClientRect();if(x>=r.left&&x<=r.right&&y>=r.top&&y<=r.bottom)return n[i].getAttribute('data-t');}return null;}
-function ms(x,y){var r=stick.getBoundingClientRect();var dx=(x-(r.left+r.width/2))/(r.width/2),dy=(y-(r.top+r.height/2))/(r.height/2);var m=Math.hypot(dx,dy);if(m>1){dx/=m;dy/=m;}stickTo(dx,dy);}
-root.addEventListener('touchstart',function(ev){for(var i=0;i<ev.changedTouches.length;i++){var t=ev.changedTouches[i],x=t.clientX,y=t.clientY,c=hit(x,y),half=innerWidth/2;if(c==='stick'){sid=t.identifier;ms(x,y);ev.preventDefault();}else if(c){ab[t.identifier]=c;press(c,true);ev.preventDefault();}else if(x<half){var r=stick.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2;if(Math.hypot(x-cx,y-cy)<Math.max(r.width,120)){sid=t.identifier;ms(x,y);ev.preventDefault();}}else if(x>=half&&lid===null){lid=t.identifier;ll={x:x,y:y};ev.preventDefault();}}}, {passive:false});
-window.addEventListener('touchmove',function(ev){for(var i=0;i<ev.changedTouches.length;i++){var t=ev.changedTouches[i];if(t.identifier===sid){ms(t.clientX,t.clientY);ev.preventDefault();}else if(t.identifier===lid&&ll){look(t.clientX-ll.x,t.clientY-ll.y);ll={x:t.clientX,y:t.clientY};ev.preventDefault();}}}, {passive:false});
-window.addEventListener('touchend',function(ev){for(var i=0;i<ev.changedTouches.length;i++){var t=ev.changedTouches[i];if(t.identifier===sid){sid=null;stickTo(0,0);}if(t.identifier===lid){lid=null;ll=null;}if(ab[t.identifier]){press(ab[t.identifier],false);delete ab[t.identifier];}}}, {passive:false});
-apply();window.addEventListener('resize',apply);save();
-})();`;
+      saveLayout();
+      const L = JSON.parse(JSON.stringify(layout));
+      L.autoForward = !!autoEl.checked;
+      const layoutJson = JSON.stringify(L);
+
+      const src =
+        "(function(){" +
+        "if(window.__codTouchOverlay){alert('Touch controls already active');return;}" +
+        "window.__codTouchOverlay=1;" +
+        "var L=" + layoutJson + ";" +
+        "var css='#cod-tc{position:fixed;inset:0;z-index:2147483000;pointer-events:none;touch-action:none}" +
+        "#cod-tc .b,#cod-tc .s{position:absolute;pointer-events:auto;touch-action:none;border:2px solid rgba(255,255,255,.45);" +
+        "background:rgba(20,20,20,.35);color:#fff;font:700 12px system-ui;display:flex;align-items:center;justify-content:center;" +
+        "text-align:center;border-radius:50%;text-shadow:0 1px 2px #000}" +
+        "#cod-tc .s{width:140px;height:140px}" +
+        "#cod-tc .k{position:absolute;left:50%;top:50%;width:56px;height:56px;margin:-28px 0 0 -28px;border-radius:50%;" +
+        "background:rgba(255,255,255,.45);border:2px solid rgba(255,255,255,.75);pointer-events:none}" +
+        "#cod-tc .b.active{background:rgba(110,194,110,.55)}';" +
+        "var st=document.createElement('style');st.textContent=css;document.documentElement.appendChild(st);" +
+        "var root=document.createElement('div');root.id='cod-tc';" +
+        "root.innerHTML='<div class=\"s\" data-t=\"stick\"><div class=\"k\" id=\"cod-k\"></div></div>" +
+        "<div class=\"b\" data-t=\"fire\">FIRE</div><div class=\"b\" data-t=\"ads\">ADS</div>" +
+        "<div class=\"b\" data-t=\"reload\">RLD</div><div class=\"b\" data-t=\"jump\">JUMP</div>" +
+        "<div class=\"b\" data-t=\"stance\">STANCE</div><div class=\"b\" data-t=\"stats\">STATS</div>';" +
+        "document.documentElement.appendChild(root);" +
+        "var tb=document.createElement('button');tb.textContent='Hide pads';" +
+        "tb.style.cssText='position:fixed;left:10px;top:10px;z-index:2147483001;padding:8px 12px;border:0;border-radius:20px;" +
+        "background:rgba(30,30,30,.9);color:#fff;font:700 13px system-ui';" +
+        "document.documentElement.appendChild(tb);var hid=false;" +
+        "tb.onclick=function(){hid=!hid;root.style.display=hid?'none':'block';" +
+        "tb.textContent=hid?'Show pads':'Hide pads';" +
+        "tb.style.background=hid?'rgba(110,194,110,.9)':'rgba(30,30,30,.9)';" +
+        "tb.style.color=hid?'#183318':'#fff';};" +
+        "function apply(){var vw=innerWidth,vh=innerHeight;" +
+        "root.querySelectorAll('[data-t]').forEach(function(el){var id=el.getAttribute('data-t'),c=L[id];if(!c)return;" +
+        "var s=c.size||64;el.style.width=s+'px';el.style.height=s+'px';" +
+        "el.style.opacity=String(c.opacity!=null?c.opacity:.4);" +
+        "el.style.left=Math.max(0,c.x*vw-s/2)+'px';el.style.top=Math.max(0,c.y*vh-s/2)+'px';});}" +
+        "function kc(c){return({KeyW:87,KeyA:65,KeyS:83,KeyD:68,Space:32,ControlLeft:17,KeyR:82,ShiftLeft:16,Tab:9})[c]||0}" +
+        "var down={};" +
+        "function key(code,key,isDown){var type=isDown?'keydown':'keyup';if(isDown){if(down[code])return;down[code]=1}" +
+        "else{if(!down[code])return;delete down[code]}" +
+        "var canvas=document.getElementById('canvas')||document.querySelector('canvas');" +
+        "var targets=[canvas,document,window].filter(Boolean);" +
+        "targets.forEach(function(t){try{t.dispatchEvent(new KeyboardEvent(type,{key:key,code:code,keyCode:kc(code),which:kc(code),bubbles:true,cancelable:true}))}catch(e){}})}" +
+        "function mouse(isDown,btn){var canvas=document.getElementById('canvas')||document.querySelector('canvas');if(!canvas)return;" +
+        "try{canvas.dispatchEvent(new MouseEvent(isDown?'mousedown':'mouseup',{bubbles:true,cancelable:true,button:btn,buttons:isDown?(btn===0?1:2):0,clientX:innerWidth*.75,clientY:innerHeight*.5}))}catch(e){}}" +
+        "function look(dx,dy){var canvas=document.getElementById('canvas')||document.querySelector('canvas');if(!canvas)return;" +
+        "var mx=dx*2.2,my=dy*2.2;try{canvas.dispatchEvent(new MouseEvent('mousemove',{bubbles:true,cancelable:true,movementX:mx,movementY:my}))}catch(e){}}" +
+        "var stick=root.querySelector('[data-t=stick]'),knob=document.getElementById('cod-k');" +
+        "function setKnob(nx,ny){var s=(L.stick&&L.stick.size)||140;knob.style.transform='translate('+(nx*s*.33)+'px,'+(ny*s*.33)+'px')}" +
+        "function stickTo(nx,ny){var d=.18,f=-ny,r=nx,m=Math.hypot(nx,ny);setKnob(nx,ny);" +
+        "key('KeyW','w',f>d);key('KeyS','s',f<-d);key('KeyA','a',r<-d);key('KeyD','d',r>d);" +
+        "key('ShiftLeft','Shift',!!(L.autoForward&&f>d&&m>.55))}" +
+        "function press(id,on){var el=root.querySelector('[data-t=\"'+id+'\"]');if(el)el.classList.toggle('active',!!on);" +
+        "if(id==='fire')mouse(on,0);else if(id==='ads')mouse(on,2);else if(id==='reload')key('KeyR','r',on);" +
+        "else if(id==='jump')key('Space',' ',on);else if(id==='stance')key('ControlLeft','Control',on);" +
+        "else if(id==='stats')key('Tab','Tab',on)}" +
+        "var sid=null,lt={},ab={};" +
+        "function hit(x,y){var n=root.querySelectorAll('[data-t]');for(var i=n.length-1;i>=0;i--){" +
+        "var r=n[i].getBoundingClientRect();if(x>=r.left&&x<=r.right&&y>=r.top&&y<=r.bottom)return n[i].getAttribute('data-t')}return null}" +
+        "function ms(x,y){var r=stick.getBoundingClientRect();var dx=(x-(r.left+r.width/2))/(r.width/2)," +
+        "dy=(y-(r.top+r.height/2))/(r.height/2);var m=Math.hypot(dx,dy);if(m>1){dx/=m;dy/=m}stickTo(dx,dy)}" +
+        "root.addEventListener('touchstart',function(ev){for(var i=0;i<ev.changedTouches.length;i++){" +
+        "var t=ev.changedTouches[i],x=t.clientX,y=t.clientY,c=hit(x,y),half=innerWidth/2;" +
+        "if(c==='stick'){sid=t.identifier;ms(x,y);ev.preventDefault()}" +
+        "else if(c){ab[t.identifier]=c;press(c,true);if(x>=half)lt[t.identifier]={x:x,y:y};ev.preventDefault()}" +
+        "else if(x<half){var r=stick.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2;" +
+        "if(Math.hypot(x-cx,y-cy)<Math.max(r.width,120)){sid=t.identifier;ms(x,y);ev.preventDefault()}}" +
+        "else if(x>=half){lt[t.identifier]={x:x,y:y};ev.preventDefault()}}}, {passive:false});" +
+        "window.addEventListener('touchmove',function(ev){for(var i=0;i<ev.changedTouches.length;i++){" +
+        "var t=ev.changedTouches[i];if(t.identifier===sid){ms(t.clientX,t.clientY);ev.preventDefault()}" +
+        "else if(lt[t.identifier]){var p=lt[t.identifier];look(t.clientX-p.x,t.clientY-p.y);" +
+        "lt[t.identifier]={x:t.clientX,y:t.clientY};ev.preventDefault()}}}, {passive:false});" +
+        "window.addEventListener('touchend',function(ev){for(var i=0;i<ev.changedTouches.length;i++){" +
+        "var t=ev.changedTouches[i];if(t.identifier===sid){sid=null;stickTo(0,0)}" +
+        "if(lt[t.identifier])delete lt[t.identifier];" +
+        "if(ab[t.identifier]){press(ab[t.identifier],false);delete ab[t.identifier]}}}, {passive:false});" +
+        "window.addEventListener('touchcancel',function(ev){for(var i=0;i<ev.changedTouches.length;i++){" +
+        "var t=ev.changedTouches[i];if(t.identifier===sid){sid=null;stickTo(0,0)}" +
+        "if(lt[t.identifier])delete lt[t.identifier];" +
+        "if(ab[t.identifier]){press(ab[t.identifier],false);delete ab[t.identifier]}}}, {passive:false});" +
+        "apply();window.addEventListener('resize',apply);" +
+        "})();";
+
       return "javascript:" + encodeURIComponent(src);
     }
 
-    document.getElementById("bookmarklet").href = buildBookmarklet();
-
-
-    // Hide / show touch pads so the webport menu is usable
-    const fabControls = document.getElementById("fab-controls");
-    let controlsHidden = false;
-    try {
-      controlsHidden = sessionStorage.getItem("cod_touch_hidden") === "1";
-    } catch (e) {}
-    function syncControlsHidden() {
-      document.body.classList.toggle("controls-hidden", controlsHidden);
-      if (fabControls) {
-        fabControls.textContent = controlsHidden ? "Show pads" : "Hide pads";
-      }
-      if (controlsHidden) releaseAll();
-    }
-    if (fabControls) {
-      fabControls.onclick = () => {
-        controlsHidden = !controlsHidden;
+    async function copyBookmarklet() {
+      const url = buildBookmarklet();
+      statusEl.className = "";
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          await navigator.clipboard.writeText(url);
+        } else {
+          const ta = document.createElement("textarea");
+          ta.value = url;
+          ta.setAttribute("readonly", "");
+          ta.style.position = "fixed";
+          ta.style.left = "-9999px";
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand("copy");
+          document.body.removeChild(ta);
+        }
+        statusEl.textContent =
+          "Copied. Create a bookmark and paste this as the URL/address.";
+      } catch (e) {
         try {
-          sessionStorage.setItem("cod_touch_hidden", controlsHidden ? "1" : "0");
-        } catch (e) {}
-        syncControlsHidden();
-      };
-    }
-    syncControlsHidden();
-
-
-    
-    // Phone keyboard helper — mobile OS keyboard + aggressive key injection
-    // for Emscripten/SDL canvas games (profile names, etc.).
-    const fabKeyboard = document.getElementById("fab-keyboard");
-    const ghostType = document.getElementById("ghost-type");
-    let keyboardOpen = false;
-    let typingBusy = false;
-
-
-    function gameTargets() {
-      const list = [];
-      const seen = new Set();
-      function add(t) {
-        if (!t || seen.has(t)) return;
-        seen.add(t);
-        list.push(t);
-      }
-      try {
-        if (sameOrigin && targetDoc) {
-          const c =
-            targetDoc.getElementById("canvas") ||
-            targetDoc.querySelector("canvas");
-          add(c);
-          add(targetDoc.body);
-          add(targetDoc);
-          if (targetWin) add(targetWin);
-          try {
-            if (targetWin.Module && targetWin.Module.canvas) {
-              add(targetWin.Module.canvas);
-            }
-          } catch (e) {}
-        }
-      } catch (e) {}
-      const localCanvas =
-        document.getElementById("canvas") ||
-        document.querySelector("canvas");
-      add(localCanvas);
-      try {
-        if (window.Module && Module.canvas) add(Module.canvas);
-      } catch (e) {}
-      add(document.body);
-      add(document);
-      add(window);
-      return list;
-    }
-
-    function focusGameCanvas() {
-      try {
-        const c =
-          document.getElementById("canvas") ||
-          document.querySelector("canvas");
-        if (c && c.focus) c.focus({ preventScroll: true });
-      } catch (e) {}
-      try {
-        if (sameOrigin && targetDoc) {
-          const c =
-            targetDoc.getElementById("canvas") ||
-            targetDoc.querySelector("canvas");
-          if (c && c.focus) c.focus({ preventScroll: true });
-        }
-      } catch (e) {}
-    }
-
-    // iOS WebKit: KeyboardEvent.keyCode is always 0 for synthetic events.
-    // SDL/Quake/COD read keyCode — so we also call Emscripten handlers with
-    // a plain object that has a real keyCode.
-    function makeFakeEvent(type, key, code, keyCode, charCode) {
-      const canvas =
-        document.getElementById("canvas") ||
-        document.querySelector("canvas") ||
-        document.body;
-      const ev = {
-        type: type,
-        key: key,
-        code: code || "",
-        keyCode: keyCode | 0,
-        which: keyCode | 0,
-        charCode: charCode | 0,
-        location: 0,
-        ctrlKey: false,
-        shiftKey: false,
-        altKey: false,
-        metaKey: false,
-        repeat: false,
-        bubbles: true,
-        cancelable: true,
-        composed: true,
-        defaultPrevented: false,
-        isTrusted: true,
-        target: canvas,
-        currentTarget: canvas,
-        srcElement: canvas,
-        view: window,
-        timeStamp: Date.now(),
-        preventDefault: function () {
-          this.defaultPrevented = true;
-        },
-        stopPropagation: function () {},
-        stopImmediatePropagation: function () {}
-      };
-      return ev;
-    }
-
-    function invokeEmscriptenHandlers(type, fake) {
-      const pools = [];
-      try {
-        if (typeof JSEvents !== "undefined") pools.push(JSEvents);
-      } catch (e) {}
-      try {
-        if (window.JSEvents) pools.push(window.JSEvents);
-      } catch (e) {}
-      try {
-        if (window.Module && Module.JSEvents) pools.push(Module.JSEvents);
-      } catch (e) {}
-      for (const JE of pools) {
-        const handlers = JE.eventHandlers || JE.handlers || [];
-        for (const h of handlers) {
-          const et =
-            h.eventTypeString ||
-            h.eventTypeName ||
-            h.type ||
-            "";
-          if (et !== type && et !== "keypress") continue;
-          if (type === "keypress" && et !== "keypress") continue;
-          if (type !== "keypress" && et === "keypress") continue;
-          const fn =
-            h.handlerFunc ||
-            h.callbackFunc ||
-            h.handler ||
-            h.callback;
-          if (typeof fn === "function") {
-            try {
-              fn(fake);
-            } catch (e) {}
-          }
-          // Some builds store eventTypeString only on keydown and branch inside
-          if (typeof fn === "function" && (type === "keydown" || type === "keyup")) {
-            try {
-              fn(type, fake);
-            } catch (e) {}
-          }
+          window.prompt("Copy this bookmarklet URL:", url);
+          statusEl.textContent = "Copy the text from the prompt into a bookmark URL.";
+        } catch (e2) {
+          statusEl.textContent = "Could not copy automatically.";
+          statusEl.className = "err";
         }
       }
-      // Direct Module hooks used by some ports
-      try {
-        if (typeof window.Browser !== "undefined" && Browser.moduleContext) {
-          /* no-op probe */
-        }
-      } catch (e) {}
     }
 
-    function fireKey(type, key, code, keyCode, charCode) {
-      const kc = keyCode | 0;
-      const cc =
-        charCode != null
-          ? charCode | 0
-          : type === "keypress"
-            ? kc
-            : 0;
-      const fake = makeFakeEvent(type, key, code, kc, cc);
-
-      // 1) Emscripten internal handlers (works when DOM keyCode is ignored)
-      invokeEmscriptenHandlers(type, fake);
-
-      // 2) on* properties
-      for (const t of gameTargets()) {
-        try {
-          const prop = "on" + type;
-          if (t && typeof t[prop] === "function") {
-            try {
-              t[prop](fake);
-            } catch (e) {}
-          }
-        } catch (e) {}
-      }
-
-      // 3) Normal dispatch (desktop / some Android)
-      for (const t of gameTargets()) {
-        try {
-          const init = {
-            key: key,
-            code: code || "",
-            keyCode: kc,
-            which: kc,
-            charCode: cc,
-            bubbles: true,
-            cancelable: true,
-            composed: true,
-            view: window
-          };
-          const ev = new KeyboardEvent(type, init);
-          try {
-            Object.defineProperty(ev, "keyCode", { get: () => kc });
-            Object.defineProperty(ev, "which", { get: () => kc });
-            Object.defineProperty(ev, "charCode", { get: () => cc });
-          } catch (e) {}
-          t.dispatchEvent(ev);
-        } catch (e) {}
-      }
-
-      // 4) Generic Event with mutable fields (legacy WebKit path)
-      for (const t of gameTargets()) {
-        try {
-          const ev = document.createEvent("Event");
-          ev.initEvent(type, true, true);
-          try {
-            ev.key = key;
-            ev.code = code || "";
-            ev.keyCode = kc;
-            ev.which = kc;
-            ev.charCode = cc;
-          } catch (e) {}
-          t.dispatchEvent(ev);
-        } catch (e) {}
-      }
-    }
-
-    function charToKey(ch) {
-      if (ch === "\n" || ch === "\r") {
-        return { key: "Enter", code: "Enter", keyCode: 13, charCode: 13 };
-      }
-      if (ch === " ") {
-        return { key: " ", code: "Space", keyCode: 32, charCode: 32 };
-      }
-      if (ch === "\b") {
-        return {
-          key: "Backspace",
-          code: "Backspace",
-          keyCode: 8,
-          charCode: 8
-        };
-      }
-      const codePt = ch.charCodeAt(0);
-      if (ch.length === 1 && ch >= "a" && ch <= "z") {
-        return {
-          key: ch,
-          code: "Key" + ch.toUpperCase(),
-          keyCode: ch.toUpperCase().charCodeAt(0),
-          charCode: codePt
-        };
-      }
-      if (ch.length === 1 && ch >= "A" && ch <= "Z") {
-        return {
-          key: ch,
-          code: "Key" + ch,
-          keyCode: codePt,
-          charCode: codePt
-        };
-      }
-      if (ch.length === 1 && ch >= "0" && ch <= "9") {
-        return {
-          key: ch,
-          code: "Digit" + ch,
-          keyCode: codePt,
-          charCode: codePt
-        };
-      }
-      return {
-        key: ch,
-        code: "",
-        keyCode: codePt,
-        charCode: codePt
-      };
-    }
-
-    function injectChar(ch) {
-      const k = charToKey(ch);
-      // Do not focus canvas here — iOS closes the keyboard if we do mid-type.
-      fireKey("keydown", k.key, k.code, k.keyCode, k.charCode);
-      fireKey("keypress", k.key, k.code, k.charCode || k.keyCode, k.charCode || k.keyCode);
-      fireKey("keyup", k.key, k.code, k.keyCode, 0);
-    }
-
-    function injectSpecial(name) {
-      const map = {
-        Backspace: { key: "Backspace", code: "Backspace", keyCode: 8 },
-        Enter: { key: "Enter", code: "Enter", keyCode: 13 },
-        Escape: { key: "Escape", code: "Escape", keyCode: 27 },
-        Tab: { key: "Tab", code: "Tab", keyCode: 9 },
-        Delete: { key: "Delete", code: "Delete", keyCode: 46 }
-      };
-      const k = map[name];
-      if (!k) return;
-      focusGameCanvas();
-      fireKey("keydown", k.key, k.code, k.keyCode, 0);
-      if (name === "Enter") {
-        fireKey("keypress", k.key, k.code, k.keyCode, k.keyCode);
-      }
-      fireKey("keyup", k.key, k.code, k.keyCode, 0);
-    }
-
-    async function injectString(str) {
-      if (typingBusy) return;
-      typingBusy = true;
-      try {
-        focusGameCanvas();
-        await new Promise((r) => setTimeout(r, 30));
-        for (const ch of str) {
-          injectChar(ch);
-          await new Promise((r) => setTimeout(r, 50));
-        }
-      } finally {
-        typingBusy = false;
-      }
-    }
-
-    function setKeyboardOpen(on) {
-      keyboardOpen = !!on;
-      document.body.classList.toggle("keyboard-open", keyboardOpen);
-      if (!ghostType) return;
-      if (keyboardOpen) {
-        // Ensure send button exists next to field
-        ensureSendBtn();
-        ghostType.value = "";
-        setTimeout(() => {
-          try {
-            ghostType.focus({ preventScroll: false });
-          } catch (e) {
-            try {
-              ghostType.focus();
-            } catch (e2) {}
-          }
-        }, 30);
-      } else {
-        try {
-          ghostType.blur();
-        } catch (e) {}
-      }
-    }
-
-    function ensureSendBtn() {
-      if (document.getElementById("ghost-send")) return;
-      const btn = document.createElement("button");
-      btn.id = "ghost-send";
-      btn.type = "button";
-      btn.textContent = "Send";
-      btn.style.cssText =
-        "position:fixed;right:8px;bottom:8px;z-index:116;padding:10px 14px;" +
-        "min-height:40px;border:0;border-radius:8px;background:#6ec26e;color:#183318;" +
-        "font-weight:700;font-size:15px;display:none;";
-      document.body.appendChild(btn);
-      const sync = () => {
-        btn.style.display = keyboardOpen ? "block" : "none";
-      };
-      const _set = setKeyboardOpen;
-      // patch visibility on toggle
-      btn.addEventListener("click", async (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        const text = ghostType.value || "";
-        if (!text) {
-          injectSpecial("Enter");
-          setTimeout(() => { try { ghostType.focus(); } catch (err) {} }, 80);
-          return;
-        }
-        await injectString(text);
-        ghostType.value = "";
-        injectSpecial("Enter");
-        setTimeout(() => {
-          try { ghostType.focus(); } catch (err) {}
-        }, 80);
-      });
-      // show/hide with keyboard
-      const obs = new MutationObserver(sync);
-      obs.observe(document.body, { attributes: true, attributeFilter: ["class"] });
-      sync();
-    }
-
-    if (fabKeyboard) {
-      const toggle = (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        setKeyboardOpen(!keyboardOpen);
-      };
-      fabKeyboard.addEventListener("click", toggle);
-      fabKeyboard.addEventListener("touchend", toggle, { passive: false });
-    }
-
-    if (ghostType) {
-      ensureSendBtn();
-      // IMPORTANT (iOS): do NOT inject or focus the canvas while typing.
-      // That steals focus and dismisses the keyboard after one letter.
-      // Only inject when user taps Send / Enter.
-      ghostType.addEventListener("keydown", (e) => {
-        if (e.key === "Enter") {
-          e.preventDefault();
-          const text = ghostType.value || "";
-          const run = async () => {
-            if (text) await injectString(text);
-            ghostType.value = "";
-            injectSpecial("Enter");
-            // Refocus field so keyboard can stay up for another try
-            setTimeout(() => {
-              try { ghostType.focus(); } catch (err) {}
-            }, 100);
-          };
-          run();
-        }
-        if (e.key === "Escape") {
-          setKeyboardOpen(false);
-        }
-      });
-      // Don't auto-close keyboard on blur while Send is being pressed
-      ghostType.addEventListener("blur", () => {
-        setTimeout(() => {
-          const ae = document.activeElement;
-          if (
-            keyboardOpen &&
-            ae !== ghostType &&
-            ae !== document.getElementById("ghost-send")
-          ) {
-            // Keep the bar open; user can tap the field again
-            // Only hide if they tapped the keyboard FAB to close
-          }
-        }, 250);
-      });
-    }
-
-
+    document.getElementById("btn-copy").onclick = copyBookmarklet;
     window.addEventListener("resize", applyLayout);
+
+    fillSelect();
+    syncSliders();
     applyLayout();
   })();
   </script>
