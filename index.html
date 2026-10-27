@@ -264,7 +264,8 @@
 
   <div id="bar">
     <input id="url" type="url" placeholder="https://your-webport.example/" autocomplete="off" spellcheck="false">
-    <button type="button" id="btn-load">Load</button>
+    <button type="button" id="btn-load">Load in frame</button>
+    <button type="button" id="btn-open">Open full page</button>
     <button type="button" id="btn-edit" class="secondary">Layout</button>
     <button type="button" id="btn-hide" class="secondary">Hide bar</button>
   </div>
@@ -274,7 +275,9 @@
 
   <div id="hint">
     <strong>Universal FPS webport touch overlay</strong><br><br>
-    Paste a webport URL and press Load.<br>
+    Paste a webport URL.<br>
+    For games that use browser storage (OPFS), use
+    <strong>Open full page</strong> + the bookmarklet — not the iframe.<br>
     Left half = move + buttons · Right half = look.
   </div>
 
@@ -316,8 +319,10 @@
       <button type="button" id="te-done">Done</button>
     </div>
     <div id="bookmarklet-box">
-      <strong>Cross-origin webports</strong> (different domain) block keyboard injection into an iframe.
-      Drag this bookmarklet onto your bookmarks bar, open the webport, then tap the bookmark to inject controls <em>into</em> that page:
+      <strong>Recommended for COD / OPFS webports</strong><br>
+      Iframes do not see your installed game files. Open the webport as a normal page, then use this bookmarklet so controls run <em>inside</em> that page (same storage, same multiplayer setup).
+      <br>
+      Drag to bookmarks → open webport → tap bookmark:
       <br>
       <a id="bookmarklet" href="#">COD Touch Controls</a>
     </div>
@@ -398,15 +403,24 @@
       }
     }
 
-    function showWarn(cross) {
-      if (!cross) {
+    function showWarn(kind) {
+      // kind: false | "cross" | "storage"
+      if (!kind) {
         warn.style.display = "none";
         return;
       }
       warn.style.display = "block";
-      warn.innerHTML =
-        "<strong>Cross-origin page</strong> — the browser blocks sending keys into this iframe. " +
-        "Open <em>Layout → bookmarklet</em>, bookmark it, then open the webport normally and run the bookmarklet so controls inject into the page.";
+      if (kind === "storage" || kind === "cross") {
+        warn.innerHTML =
+          "<strong>Iframe cannot use your installed game data</strong><br>" +
+          "Browsers isolate storage (OPFS) and often block input inside cross-site iframes. " +
+          "Your COD install lives on the <em>real</em> webport page, not in this frame.<br><br>" +
+          "<strong>Correct way:</strong><br>" +
+          "1) Press <em>Open full page</em> (or open the webport in its own tab)<br>" +
+          "2) Open <em>Layout</em> here → drag <em>COD Touch Controls</em> to your bookmarks<br>" +
+          "3) On the webport tab, tap that bookmark to inject touch controls<br>" +
+          "4) Use <em>Hide pads</em> when you need the main menu";
+      }
     }
 
     function keyCodeFor(code) {
@@ -667,32 +681,78 @@
     window.addEventListener("touchcancel", onEnd, { passive: false });
 
     // ---- Load URL ----
-    function loadUrl() {
+    function normalizeUrl() {
       let u = (urlInput.value || "").trim();
-      if (!u) return;
+      if (!u) return "";
       if (!/^https?:\/\//i.test(u)) u = "https://" + u;
       urlInput.value = u;
+      return u;
+    }
+
+    function loadUrl() {
+      const u = normalizeUrl();
+      if (!u) return;
       hint.style.display = "none";
       document.body.classList.add("playing");
       frame.src = u;
       releaseAll();
-      showWarn(false);
+      // Iframes almost never share the top-level OPFS install for webports.
+      // Always show guidance; refine after load if same-origin.
+      showWarn("storage");
       frame.onload = function () {
         resolveTargets();
-        showWarn(!sameOrigin);
+        // Same-origin iframe can share storage; cross-origin cannot.
+        showWarn(sameOrigin ? false : "cross");
+        if (sameOrigin) {
+          // Still tip: COI / service worker may require top-level
+          warn.style.display = "block";
+          warn.innerHTML =
+            "<strong>Same-origin iframe</strong> — storage may work, but many webports " +
+            "need a <em>top-level</em> page for multi-thread / COOP. " +
+            "If the game looks uninstalled or fails to boot, use <em>Open full page</em> + bookmarklet.";
+        }
         applyLayout();
       };
-      // assume cross until proven otherwise
       setTimeout(() => {
         resolveTargets();
-        showWarn(!sameOrigin && !!frame.src);
+        if (!sameOrigin && frame.src) showWarn("cross");
       }, 800);
     }
 
+    function openFullPage() {
+      const u = normalizeUrl();
+      if (!u) return;
+      // Remember URL for convenience
+      try { localStorage.setItem("cod_touch_last_url", u); } catch (e) {}
+      const w = window.open(u, "_blank");
+      // Show instructions on this page
+      hint.style.display = "none";
+      showWarn("storage");
+      warn.style.display = "block";
+      warn.innerHTML =
+        "<strong>Opened webport in a new tab</strong><br>" +
+        "That tab has your real OPFS install and multiplayer isolation.<br>" +
+        "1) Here: <em>Layout</em> → bookmark <em>COD Touch Controls</em><br>" +
+        "2) There: run the bookmarklet after the game UI is visible<br>" +
+        "3) <em>Hide pads</em> when using menus, <em>Show pads</em> to play";
+      if (!w) {
+        // Popup blocked — navigate this tab instead
+        warn.innerHTML +=
+          "<br><br>Popup blocked. <a href=\"" + u.replace(/"/g, "") +
+          "\" style=\"color:#9cf\">Tap here to open the webport in this tab</a>, " +
+          "then use the bookmarklet.";
+      }
+    }
+
     document.getElementById("btn-load").onclick = loadUrl;
+    document.getElementById("btn-open").onclick = openFullPage;
     urlInput.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") loadUrl();
+      if (e.key === "Enter") openFullPage();
     });
+    try {
+      const last = localStorage.getItem("cod_touch_last_url");
+      if (last && !urlInput.value) urlInput.value = last;
+    } catch (e) {}
 
     document.getElementById("btn-hide").onclick = () => {
       bar.classList.add("collapsed");
