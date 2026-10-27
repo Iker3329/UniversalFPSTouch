@@ -538,45 +538,17 @@
             }));
           } catch (e) {}
         }
-        var lookAccumX = 0, lookAccumY = 0;
         function getCanvas() {
           try {
             if (window.Module && Module.canvas) return Module.canvas;
           } catch (e) {}
           return document.getElementById("canvas") || document.querySelector("canvas");
         }
-        function callMouseHandlers(fake) {
-          var pools = [];
-          try { if (typeof JSEvents !== "undefined") pools.push(JSEvents); } catch (e) {}
-          try { if (window.JSEvents) pools.push(window.JSEvents); } catch (e) {}
-          for (var p = 0; p < pools.length; p++) {
-            var hs = pools[p].eventHandlers || [];
-            for (var i = 0; i < hs.length; i++) {
-              var h = hs[i];
-              var et = h.eventTypeString || h.eventTypeName || "";
-              if (et !== "mousemove" && et !== "pointermove") continue;
-              var fn = h.handlerFunc || h.callbackFunc || h.handler;
-              if (typeof fn === "function") {
-                try { fn(fake); } catch (e) {}
-              }
-            }
-          }
-        }
         function look(dx, dy) {
-          // Light smoothing — kills single-frame spikes from touch noise
-          lookAccumX = lookAccumX * 0.35 + dx * 0.65;
-          lookAccumY = lookAccumY * 0.35 + dy * 0.65;
-
-          var sens = 2.4;
-          var mx = lookAccumX * sens;
-          var my = lookAccumY * sens;
-
-          // Deadzone
-          if (mx * mx + my * my < 0.25) return;
-
-          // One clean relative move only (no center-warp spam)
-          mx = Math.round(mx * 10) / 10;
-          my = Math.round(my * 10) / 10;
+          var sens = 2.6;
+          var mx = dx * sens;
+          var my = dy * sens;
+          if (mx * mx + my * my < 0.15) return;
 
           var canvas = getCanvas();
           if (!canvas) return;
@@ -628,37 +600,46 @@
             stopImmediatePropagation: function () {}
           };
 
-          // Prefer Emscripten handlers once; DOM dispatch as fallback only
-          var usedJE = false;
+          // Emscripten internal handlers
           try {
-            if (typeof JSEvents !== "undefined" && JSEvents.eventHandlers && JSEvents.eventHandlers.length) {
-              callMouseHandlers(fake);
-              usedJE = true;
+            var pools = [];
+            if (typeof JSEvents !== "undefined") pools.push(JSEvents);
+            if (window.JSEvents) pools.push(window.JSEvents);
+            for (var p = 0; p < pools.length; p++) {
+              var hs = pools[p].eventHandlers || [];
+              for (var i = 0; i < hs.length; i++) {
+                var h = hs[i];
+                var et = h.eventTypeString || "";
+                if (et !== "mousemove" && et !== "pointermove") continue;
+                var fn = h.handlerFunc || h.callbackFunc || h.handler;
+                if (typeof fn === "function") {
+                  try { fn(fake); } catch (e) {}
+                }
+              }
             }
           } catch (e) {}
 
-          if (!usedJE) {
-            var targets = [canvas, document];
-            for (var i = 0; i < targets.length; i++) {
-              var t = targets[i];
-              if (!t) continue;
+          // DOM events (needed by some builds)
+          var targets = [canvas, document, window];
+          for (var j = 0; j < targets.length; j++) {
+            var t = targets[j];
+            if (!t) continue;
+            try {
+              var ev = new MouseEvent("mousemove", {
+                bubbles: true,
+                cancelable: true,
+                view: window,
+                clientX: cx,
+                clientY: cy,
+                movementX: mx,
+                movementY: my
+              });
               try {
-                var ev = new MouseEvent("mousemove", {
-                  bubbles: true,
-                  cancelable: true,
-                  view: window,
-                  clientX: cx,
-                  clientY: cy,
-                  movementX: mx,
-                  movementY: my
-                });
-                try {
-                  Object.defineProperty(ev, "movementX", { get: function () { return mx; } });
-                  Object.defineProperty(ev, "movementY", { get: function () { return my; } });
-                } catch (e2) {}
-                t.dispatchEvent(ev);
-              } catch (e) {}
-            }
+                Object.defineProperty(ev, "movementX", { get: function () { return mx; } });
+                Object.defineProperty(ev, "movementY", { get: function () { return my; } });
+              } catch (e2) {}
+              t.dispatchEvent(ev);
+            } catch (e) {}
           }
         }
 
@@ -775,11 +756,7 @@
           for (var i = 0; i < ev.changedTouches.length; i++) {
             var t = ev.changedTouches[i];
             if (t.identifier === sid) { sid = null; stickTo(0, 0); }
-            if (lt[t.identifier]) {
-              delete lt[t.identifier];
-              lookAccumX = 0;
-              lookAccumY = 0;
-            }
+            if (lt[t.identifier]) delete lt[t.identifier];
             if (ab[t.identifier]) {
               press(ab[t.identifier], false);
               delete ab[t.identifier];
