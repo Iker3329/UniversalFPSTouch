@@ -538,14 +538,14 @@
             }));
           } catch (e) {}
         }
-        var lookCX = 0, lookCY = 0, lookInit = false;
+        var lookAccumX = 0, lookAccumY = 0;
         function getCanvas() {
           try {
             if (window.Module && Module.canvas) return Module.canvas;
           } catch (e) {}
           return document.getElementById("canvas") || document.querySelector("canvas");
         }
-        function callMouseHandlers(type, fake) {
+        function callMouseHandlers(fake) {
           var pools = [];
           try { if (typeof JSEvents !== "undefined") pools.push(JSEvents); } catch (e) {}
           try { if (window.JSEvents) pools.push(window.JSEvents); } catch (e) {}
@@ -554,36 +554,46 @@
             for (var i = 0; i < hs.length; i++) {
               var h = hs[i];
               var et = h.eventTypeString || h.eventTypeName || "";
-              if (et !== type && !(type === "mousemove" && (et === "mousemove" || et === "pointermove"))) continue;
+              if (et !== "mousemove" && et !== "pointermove") continue;
               var fn = h.handlerFunc || h.callbackFunc || h.handler;
               if (typeof fn === "function") {
                 try { fn(fake); } catch (e) {}
-                try { fn(type, fake); } catch (e) {}
               }
             }
           }
         }
-        function fireMove(canvas, cx, cy, mx, my) {
-          // Integer deltas — some engines ignore subpixel movementX
-          mx = mx|0;
-          my = my|0;
-          if (!mx && !my) return;
+        function look(dx, dy) {
+          // Light smoothing — kills single-frame spikes from touch noise
+          lookAccumX = lookAccumX * 0.35 + dx * 0.65;
+          lookAccumY = lookAccumY * 0.35 + dy * 0.65;
+
+          var sens = 2.4;
+          var mx = lookAccumX * sens;
+          var my = lookAccumY * sens;
+
+          // Deadzone
+          if (mx * mx + my * my < 0.25) return;
+
+          // One clean relative move only (no center-warp spam)
+          mx = Math.round(mx * 10) / 10;
+          my = Math.round(my * 10) / 10;
+
+          var canvas = getCanvas();
+          if (!canvas) return;
+          var rect = canvas.getBoundingClientRect();
+          var cx = rect.left + rect.width * 0.5;
+          var cy = rect.top + rect.height * 0.5;
 
           try {
             if (typeof Browser !== "undefined" && Browser) {
               if ("mouseMovementX" in Browser) Browser.mouseMovementX = mx;
               if ("mouseMovementY" in Browser) Browser.mouseMovementY = my;
-              if ("mouseX" in Browser) Browser.mouseX = cx;
-              if ("mouseY" in Browser) Browser.mouseY = cy;
             }
           } catch (e) {}
           try {
             if (window.Module && Module.Browser) {
-              var B = Module.Browser;
-              if ("mouseMovementX" in B) B.mouseMovementX = mx;
-              if ("mouseMovementY" in B) B.mouseMovementY = my;
-              if ("mouseX" in B) B.mouseX = cx;
-              if ("mouseY" in B) B.mouseY = cy;
+              if ("mouseMovementX" in Module.Browser) Module.Browser.mouseMovementX = mx;
+              if ("mouseMovementY" in Module.Browser) Module.Browser.mouseMovementY = my;
             }
           } catch (e) {}
 
@@ -597,8 +607,6 @@
             pageY: cy,
             screenX: cx,
             screenY: cy,
-            offsetX: cx,
-            offsetY: cy,
             movementX: mx,
             movementY: my,
             mozMovementX: mx,
@@ -619,57 +627,39 @@
             stopPropagation: function () {},
             stopImmediatePropagation: function () {}
           };
-          callMouseHandlers("mousemove", fake);
-          callMouseHandlers("pointermove", fake);
 
-          var targets = [canvas, document, window];
-          for (var i = 0; i < targets.length; i++) {
-            var t = targets[i];
-            if (!t) continue;
-            try {
-              if (typeof t.onmousemove === "function") t.onmousemove(fake);
-            } catch (e) {}
-            try {
-              var ev = new MouseEvent("mousemove", {
-                bubbles: true,
-                cancelable: true,
-                view: window,
-                clientX: cx,
-                clientY: cy,
-                screenX: cx,
-                screenY: cy,
-                movementX: mx,
-                movementY: my
-              });
+          // Prefer Emscripten handlers once; DOM dispatch as fallback only
+          var usedJE = false;
+          try {
+            if (typeof JSEvents !== "undefined" && JSEvents.eventHandlers && JSEvents.eventHandlers.length) {
+              callMouseHandlers(fake);
+              usedJE = true;
+            }
+          } catch (e) {}
+
+          if (!usedJE) {
+            var targets = [canvas, document];
+            for (var i = 0; i < targets.length; i++) {
+              var t = targets[i];
+              if (!t) continue;
               try {
-                Object.defineProperty(ev, "movementX", { get: function () { return mx; } });
-                Object.defineProperty(ev, "movementY", { get: function () { return my; } });
-              } catch (e2) {}
-              t.dispatchEvent(ev);
-            } catch (e) {}
+                var ev = new MouseEvent("mousemove", {
+                  bubbles: true,
+                  cancelable: true,
+                  view: window,
+                  clientX: cx,
+                  clientY: cy,
+                  movementX: mx,
+                  movementY: my
+                });
+                try {
+                  Object.defineProperty(ev, "movementX", { get: function () { return mx; } });
+                  Object.defineProperty(ev, "movementY", { get: function () { return my; } });
+                } catch (e2) {}
+                t.dispatchEvent(ev);
+              } catch (e) {}
+            }
           }
-        }
-        function look(dx, dy) {
-          var canvas = getCanvas();
-          if (!canvas) return;
-          var rect = canvas.getBoundingClientRect();
-          var centerX = rect.left + rect.width * 0.5;
-          var centerY = rect.top + rect.height * 0.5;
-
-          // Stronger horizontal gain — many ports scale yaw lower; iOS also eats X gestures
-          var sensX = 4.5;
-          var sensY = 3.0;
-          var mx = dx * sensX;
-          var my = dy * sensY;
-
-          // Relative-style look: move from canvas center by delta (works without pointer lock)
-          fireMove(canvas, centerX + mx, centerY + my, mx, my);
-
-          // Some engines only apply delta from successive absolute positions
-          fireMove(canvas, centerX + mx * 2, centerY + my * 2, mx, my);
-
-          // Reset cursor toward center so next drag keeps working
-          fireMove(canvas, centerX, centerY, 0, 0);
         }
 
         var stick = root.querySelector('[data-t="stick"]');
@@ -785,7 +775,11 @@
           for (var i = 0; i < ev.changedTouches.length; i++) {
             var t = ev.changedTouches[i];
             if (t.identifier === sid) { sid = null; stickTo(0, 0); }
-            if (lt[t.identifier]) delete lt[t.identifier];
+            if (lt[t.identifier]) {
+              delete lt[t.identifier];
+              lookAccumX = 0;
+              lookAccumY = 0;
+            }
             if (ab[t.identifier]) {
               press(ab[t.identifier], false);
               delete ab[t.identifier];
