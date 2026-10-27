@@ -214,6 +214,53 @@
       color: #183318;
     }
 
+    #fab-keyboard {
+      position: fixed;
+      left: 10px;
+      bottom: 10px;
+      z-index: 110;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      border: 0;
+      background: rgba(30,30,30,0.9);
+      color: #fff;
+      font-size: 22px;
+      line-height: 1;
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+    }
+    body.playing #fab-keyboard { display: flex; }
+    body.controls-hidden #fab-keyboard { display: flex; }
+    body.keyboard-open #fab-keyboard {
+      background: rgba(110, 194, 110, 0.95);
+      color: #183318;
+    }
+    #ghost-type {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 115;
+      width: 100%;
+      max-width: 100%;
+      padding: 12px 14px;
+      font-size: 16px; /* prevents iOS zoom */
+      border: 0;
+      border-top: 1px solid #444;
+      background: rgba(16,14,20,0.96);
+      color: #fff;
+      display: none;
+      box-sizing: border-box;
+    }
+    body.keyboard-open #ghost-type {
+      display: block;
+    }
+
+
 
     #editor {
       display: none;
@@ -271,6 +318,8 @@
   </div>
 
   <button type="button" id="fab-controls" title="Hide or show touch controls">Hide pads</button>
+  <button type="button" id="fab-keyboard" title="Open phone keyboard" aria-label="Keyboard">⌨</button>
+  <input id="ghost-type" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Type here (profile name, etc.)">
   <button type="button" id="fab-toggle" title="Show bar">☰</button>
 
   <div id="hint">
@@ -883,7 +932,7 @@ var css='#cod-tc{position:fixed;inset:0;z-index:2147483000;pointer-events:none;t
 var st=document.createElement('style');st.textContent=css;document.documentElement.appendChild(st);
 var root=document.createElement('div');root.id='cod-tc';
 root.innerHTML='<div class="s" data-t="stick"><div class="k" id="cod-k"></div></div><div class="b" data-t="fire">FIRE</div><div class="b" data-t="ads">ADS</div><div class="b" data-t="reload">RLD</div><div class="b" data-t="jump">JUMP</div><div class="b" data-t="stance">STANCE</div><div class="b" data-t="stats">STATS</div>';
-document.documentElement.appendChild(root);var tb=document.createElement('button');tb.textContent='Hide pads';tb.style.cssText='position:fixed;left:10px;top:10px;z-index:2147483001;padding:8px 12px;border:0;border-radius:20px;background:rgba(30,30,30,.9);color:#fff;font:700 13px system-ui';document.documentElement.appendChild(tb);var hid=false;tb.onclick=function(){hid=!hid;root.style.display=hid?'none':'block';tb.textContent=hid?'Show pads':'Hide pads';tb.style.background=hid?'rgba(110,194,110,.9)':'rgba(30,30,30,.9)';tb.style.color=hid?'#183318':'#fff';};
+document.documentElement.appendChild(root);var tb=document.createElement('button');tb.textContent='Hide pads';tb.style.cssText='position:fixed;left:10px;top:10px;z-index:2147483001;padding:8px 12px;border:0;border-radius:20px;background:rgba(30,30,30,.9);color:#fff;font:700 13px system-ui';document.documentElement.appendChild(tb);var hid=false;tb.onclick=function(){hid=!hid;root.style.display=hid?'none':'block';tb.textContent=hid?'Show pads':'Hide pads';tb.style.background=hid?'rgba(110,194,110,.9)':'rgba(30,30,30,.9)';tb.style.color=hid?'#183318':'#fff';};var kb=document.createElement('button');kb.textContent='\u2328';kb.title='Keyboard';kb.style.cssText='position:fixed;left:10px;bottom:10px;z-index:2147483001;width:48px;height:48px;border:0;border-radius:50%;background:rgba(30,30,30,.9);color:#fff;font:22px system-ui';document.documentElement.appendChild(kb);var gi=document.createElement('input');gi.type='text';gi.autocomplete='off';gi.spellcheck=false;gi.placeholder='Type here (profile name, etc.)';gi.style.cssText='position:fixed;left:0;right:0;bottom:0;z-index:2147483002;width:100%;padding:12px 14px;font-size:16px;border:0;border-top:1px solid #444;background:rgba(16,14,20,.96);color:#fff;display:none;box-sizing:border-box';document.documentElement.appendChild(gi);var kopen=false;function setKB(on){kopen=!!on;gi.style.display=kopen?'block':'none';kb.style.background=kopen?'rgba(110,194,110,.95)':'rgba(30,30,30,.9)';kb.style.color=kopen?'#183318':'#fff';if(kopen){gi.value='';setTimeout(function(){try{gi.focus()}catch(e){}},50)}else{try{gi.blur()}catch(e){}}}kb.onclick=function(e){e.preventDefault();e.stopPropagation();setKB(!kopen)};function fwd(type,key,code,kc){var canvas=document.getElementById('canvas')||document.querySelector('canvas');var targets=[canvas,document,window].filter(Boolean);targets.forEach(function(t){try{var ev=new KeyboardEvent(type,{key:key,code:code,keyCode:kc,which:kc,bubbles:true,cancelable:true});t.dispatchEvent(ev)}catch(e){}})}gi.addEventListener('keydown',function(e){var sp={Backspace:['Backspace','Backspace',8],Enter:['Enter','Enter',13],Escape:['Escape','Escape',27]};if(sp[e.key]){var x=sp[e.key];fwd('keydown',x[0],x[1],x[2])}});gi.addEventListener('input',function(){var v=gi.value;if(!v)return;for(var i=0;i<v.length;i++){var ch=v[i],k=ch,c='',kc=ch.charCodeAt(0);if(ch===' '){c='Space';kc=32}else if(ch>='a'&&ch<='z'){c='Key'+ch.toUpperCase()}else if(ch>='A'&&ch<='Z'){c='Key'+ch}else if(ch>='0'&&ch<='9'){c='Digit'+ch}fwd('keydown',k,c,kc);fwd('keyup',k,c,kc)}gi.value=''});gi.addEventListener('blur',function(){setTimeout(function(){if(kopen&&document.activeElement!==gi){kopen=false;gi.style.display='none';kb.style.background='rgba(30,30,30,.9)';kb.style.color='#fff'}},200)});
 function save(){try{localStorage.setItem(S,JSON.stringify(L));}catch(e){}}
 function apply(){var vw=innerWidth,vh=innerHeight;root.querySelectorAll('[data-t]').forEach(function(el){var id=el.getAttribute('data-t');var c=L[id];if(!c)return;var s=c.size||64;el.style.width=s+'px';el.style.height=s+'px';el.style.opacity=String(c.opacity!=null?c.opacity:.4);el.style.left=Math.max(0,c.x*vw-s/2)+'px';el.style.top=Math.max(0,c.y*vh-s/2)+'px';});}
 function kc(c){return({KeyW:87,KeyA:65,KeyS:83,KeyD:68,Space:32,ControlLeft:17,KeyR:82,ShiftLeft:16,Tab:9,KeyV:86})[c]||0;}
@@ -935,6 +984,145 @@ apply();window.addEventListener('resize',apply);save();
       };
     }
     syncControlsHidden();
+
+
+    // Phone keyboard helper — focus a real input so the OS keyboard opens,
+    // then forward keys into the game (iframe or same page via bookmarklet).
+    const fabKeyboard = document.getElementById("fab-keyboard");
+    const ghostType = document.getElementById("ghost-type");
+    let keyboardOpen = false;
+
+    function setKeyboardOpen(on) {
+      keyboardOpen = !!on;
+      document.body.classList.toggle("keyboard-open", keyboardOpen);
+      if (!ghostType) return;
+      if (keyboardOpen) {
+        ghostType.value = "";
+        // Focus after a tick so mobile browsers actually show the keyboard
+        setTimeout(() => {
+          try { ghostType.focus({ preventScroll: false }); } catch (e) {
+            try { ghostType.focus(); } catch (e2) {}
+          }
+        }, 50);
+      } else {
+        try { ghostType.blur(); } catch (e) {}
+      }
+    }
+
+    function forwardKeyFromGhost(type, key, code, keyCode) {
+      const targets = [];
+      if (sameOrigin && targetDoc) {
+        const c = targetDoc.getElementById("canvas") || targetDoc.querySelector("canvas");
+        if (c) targets.push(c);
+        targets.push(targetDoc);
+        if (targetWin) targets.push(targetWin);
+      }
+      // Always also try top window (harmless if unused)
+      targets.push(document);
+      targets.push(window);
+      for (const t of targets) {
+        try {
+          const ev = new KeyboardEvent(type, {
+            key: key,
+            code: code,
+            keyCode: keyCode,
+            which: keyCode,
+            bubbles: true,
+            cancelable: true,
+            view: targetWin || window
+          });
+          try {
+            Object.defineProperty(ev, "keyCode", { get: () => keyCode });
+            Object.defineProperty(ev, "which", { get: () => keyCode });
+          } catch (e) {}
+          t.dispatchEvent(ev);
+        } catch (e) {}
+      }
+    }
+
+    function codeForChar(ch) {
+      if (ch === " ") return [" ", "Space", 32];
+      if (ch.length === 1) {
+        const up = ch.toUpperCase();
+        if (up >= "A" && up <= "Z") {
+          return [ch, "Key" + up, up.charCodeAt(0)];
+        }
+        if (ch >= "0" && ch <= "9") {
+          return [ch, "Digit" + ch, ch.charCodeAt(0)];
+        }
+        return [ch, "", ch.charCodeAt(0)];
+      }
+      return [ch, "", 0];
+    }
+
+    if (fabKeyboard) {
+      fabKeyboard.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setKeyboardOpen(!keyboardOpen);
+      });
+      // Don't let the touch overlay steal the tap
+      fabKeyboard.addEventListener("touchend", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setKeyboardOpen(!keyboardOpen);
+      }, { passive: false });
+    }
+
+    if (ghostType) {
+      ghostType.addEventListener("keydown", (e) => {
+        // Let special keys through to the game
+        const special = {
+          Backspace: ["Backspace", "Backspace", 8],
+          Enter: ["Enter", "Enter", 13],
+          Escape: ["Escape", "Escape", 27],
+          Tab: ["Tab", "Tab", 9],
+          ArrowLeft: ["ArrowLeft", "ArrowLeft", 37],
+          ArrowRight: ["ArrowRight", "ArrowRight", 39],
+          ArrowUp: ["ArrowUp", "ArrowUp", 38],
+          ArrowDown: ["ArrowDown", "ArrowDown", 40],
+          Delete: ["Delete", "Delete", 46]
+        };
+        if (special[e.key]) {
+          const [k, c, kc] = special[e.key];
+          forwardKeyFromGhost("keydown", k, c, kc);
+          // Don't preventDefault on Backspace so the field stays usable;
+          // still forward so game text fields get it.
+        }
+      });
+      ghostType.addEventListener("keyup", (e) => {
+        const special = {
+          Backspace: ["Backspace", "Backspace", 8],
+          Enter: ["Enter", "Enter", 13],
+          Escape: ["Escape", "Escape", 27],
+          Tab: ["Tab", "Tab", 9]
+        };
+        if (special[e.key]) {
+          const [k, c, kc] = special[e.key];
+          forwardKeyFromGhost("keyup", k, c, kc);
+        }
+      });
+      ghostType.addEventListener("input", (e) => {
+        const val = ghostType.value;
+        if (!val) return;
+        // Forward each new character as keydown+keyup
+        for (const ch of val) {
+          const [k, c, kc] = codeForChar(ch);
+          forwardKeyFromGhost("keydown", k, c, kc);
+          forwardKeyFromGhost("keyup", k, c, kc);
+        }
+        ghostType.value = "";
+      });
+      ghostType.addEventListener("blur", () => {
+        // Small delay: iOS may blur briefly while rearranging
+        setTimeout(() => {
+          if (keyboardOpen && document.activeElement !== ghostType) {
+            document.body.classList.remove("keyboard-open");
+            keyboardOpen = false;
+          }
+        }, 200);
+      });
+    }
 
     window.addEventListener("resize", applyLayout);
     applyLayout();
