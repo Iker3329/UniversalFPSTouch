@@ -618,6 +618,7 @@
               if (typeof t.onmousemove === "function") t.onmousemove(fake);
             } catch (e) {}
             try {
+              var evMx = mx, evMy = my;
               var ev = new MouseEvent("mousemove", {
                 bubbles: true,
                 cancelable: true,
@@ -626,12 +627,12 @@
                 clientY: cy,
                 screenX: cx,
                 screenY: cy,
-                movementX: mx,
-                movementY: my
+                movementX: evMx,
+                movementY: evMy
               });
               try {
-                Object.defineProperty(ev, "movementX", { get: function () { return mx; } });
-                Object.defineProperty(ev, "movementY", { get: function () { return my; } });
+                Object.defineProperty(ev, "movementX", { get: function () { return evMx; } });
+                Object.defineProperty(ev, "movementY", { get: function () { return evMy; } });
               } catch (e2) {}
               t.dispatchEvent(ev);
             } catch (e) {}
@@ -641,16 +642,14 @@
           var canvas = getCanvas();
           if (!canvas) return;
           var rect = canvas.getBoundingClientRect();
-          var centerX = rect.left + rect.width * 0.5;
-          var centerY = rect.top + rect.height * 0.5;
-
-          // Same path that previously moved the camera; slightly calmer gain
-          var mx = dx * 3.2;
-          var my = dy * 2.8;
+          // Keep absolute cursor STABLE at canvas center every frame.
+          // Only movementX/Y change — avoids spring-back from cursor warping.
+          var cx = rect.left + rect.width * 0.5;
+          var cy = rect.top + rect.height * 0.5;
+          var mx = dx * 3.0;
+          var my = dy * 2.6;
           if (mx === 0 && my === 0) return;
-
-          // One relative pulse from center (this is what made look work)
-          fireMove(canvas, centerX + mx, centerY + my, mx, my);
+          fireMove(canvas, cx, cy, mx, my);
         }
 
         var stick = root.querySelector('[data-t="stick"]');
