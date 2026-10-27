@@ -423,7 +423,7 @@
         }
         window.__codTouchOverlay = 1;
 
-        var css = "#cod-tc{position:fixed;inset:0;z-index:2147483000;pointer-events:auto;touch-action:none}" +
+        var css = "html,body{touch-action:none!important;overscroll-behavior:none!important}" +"#cod-tc{position:fixed;inset:0;z-index:2147483000;pointer-events:auto;touch-action:none;overscroll-behavior:none}" +
           "#cod-tc .zone-l{position:absolute;left:0;top:0;bottom:0;width:50%;z-index:0}" +
           "#cod-tc .zone-r{position:absolute;right:0;top:0;bottom:0;width:50%;z-index:0}" +
           "#cod-tc .b,#cod-tc .s{position:absolute;z-index:2;border:2px solid rgba(255,255,255,.45);" +
@@ -451,6 +451,13 @@
           '<div class="b" data-t="stance">STANCE</div>' +
           '<div class="b" data-t="stats">STATS</div>';
         document.documentElement.appendChild(root);
+        try {
+          document.documentElement.style.touchAction = "none";
+          document.body.style.touchAction = "none";
+          document.body.style.overflow = "hidden";
+          document.documentElement.style.overflow = "hidden";
+        } catch (e) {}
+
 
         var tb = document.createElement("button");
         tb.textContent = "Hide pads";
@@ -535,8 +542,7 @@
             for (var i = 0; i < hs.length; i++) {
               var h = hs[i];
               var et = h.eventTypeString || h.eventTypeName || "";
-              if (et !== type && et !== "mousemove" && et !== "pointermove") continue;
-              if (type === "mousemove" && et !== "mousemove" && et !== "pointermove") continue;
+              if (et !== type && !(type === "mousemove" && (et === "mousemove" || et === "pointermove"))) continue;
               var fn = h.handlerFunc || h.callbackFunc || h.handler;
               if (typeof fn === "function") {
                 try { fn(fake); } catch (e) {}
@@ -545,28 +551,18 @@
             }
           }
         }
-        function look(dx, dy) {
-          var canvas = getCanvas();
-          if (!canvas) return;
-          if (!lookInit) {
-            var r = canvas.getBoundingClientRect();
-            lookCX = r.left + r.width * 0.5;
-            lookCY = r.top + r.height * 0.5;
-            lookInit = true;
-          }
-          var sens = 3.2;
-          var mx = dx * sens;
-          var my = dy * sens;
-          lookCX += mx;
-          lookCY += my;
+        function fireMove(canvas, cx, cy, mx, my) {
+          // Integer deltas — some engines ignore subpixel movementX
+          mx = mx|0;
+          my = my|0;
+          if (!mx && !my) return;
 
-          // Update Emscripten Browser mouse deltas if present
           try {
             if (typeof Browser !== "undefined" && Browser) {
               if ("mouseMovementX" in Browser) Browser.mouseMovementX = mx;
               if ("mouseMovementY" in Browser) Browser.mouseMovementY = my;
-              if ("mouseX" in Browser) Browser.mouseX = lookCX;
-              if ("mouseY" in Browser) Browser.mouseY = lookCY;
+              if ("mouseX" in Browser) Browser.mouseX = cx;
+              if ("mouseY" in Browser) Browser.mouseY = cy;
             }
           } catch (e) {}
           try {
@@ -574,6 +570,8 @@
               var B = Module.Browser;
               if ("mouseMovementX" in B) B.mouseMovementX = mx;
               if ("mouseMovementY" in B) B.mouseMovementY = my;
+              if ("mouseX" in B) B.mouseX = cx;
+              if ("mouseY" in B) B.mouseY = cy;
             }
           } catch (e) {}
 
@@ -581,12 +579,14 @@
             type: "mousemove",
             buttons: 0,
             button: 0,
-            clientX: lookCX,
-            clientY: lookCY,
-            pageX: lookCX,
-            pageY: lookCY,
-            screenX: lookCX,
-            screenY: lookCY,
+            clientX: cx,
+            clientY: cy,
+            pageX: cx,
+            pageY: cy,
+            screenX: cx,
+            screenY: cy,
+            offsetX: cx,
+            offsetY: cy,
             movementX: mx,
             movementY: my,
             mozMovementX: mx,
@@ -622,10 +622,10 @@
                 bubbles: true,
                 cancelable: true,
                 view: window,
-                clientX: lookCX,
-                clientY: lookCY,
-                screenX: lookCX,
-                screenY: lookCY,
+                clientX: cx,
+                clientY: cy,
+                screenX: cx,
+                screenY: cy,
                 movementX: mx,
                 movementY: my
               });
@@ -636,6 +636,28 @@
               t.dispatchEvent(ev);
             } catch (e) {}
           }
+        }
+        function look(dx, dy) {
+          var canvas = getCanvas();
+          if (!canvas) return;
+          var rect = canvas.getBoundingClientRect();
+          var centerX = rect.left + rect.width * 0.5;
+          var centerY = rect.top + rect.height * 0.5;
+
+          // Stronger horizontal gain — many ports scale yaw lower; iOS also eats X gestures
+          var sensX = 4.5;
+          var sensY = 3.0;
+          var mx = dx * sensX;
+          var my = dy * sensY;
+
+          // Relative-style look: move from canvas center by delta (works without pointer lock)
+          fireMove(canvas, centerX + mx, centerY + my, mx, my);
+
+          // Some engines only apply delta from successive absolute positions
+          fireMove(canvas, centerX + mx * 2, centerY + my * 2, mx, my);
+
+          // Reset cursor toward center so next drag keeps working
+          fireMove(canvas, centerX, centerY, 0, 0);
         }
 
         var stick = root.querySelector('[data-t="stick"]');
