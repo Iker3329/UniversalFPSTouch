@@ -424,9 +424,10 @@
         window.__codTouchOverlay = 1;
 
         var css = "#cod-tc{position:fixed;inset:0;z-index:2147483000;pointer-events:none;touch-action:none}" +
+          "#cod-tc .zone-r{position:absolute;right:0;top:0;bottom:0;width:50%;pointer-events:auto;touch-action:none;z-index:0}" +
           "#cod-tc .b,#cod-tc .s{position:absolute;pointer-events:auto;touch-action:none;border:2px solid rgba(255,255,255,.45);" +
           "background:rgba(20,20,20,.35);color:#fff;font:700 12px system-ui;display:flex;align-items:center;justify-content:center;" +
-          "text-align:center;border-radius:50%;text-shadow:0 1px 2px #000}" +
+          "text-align:center;border-radius:50%;text-shadow:0 1px 2px #000;z-index:1}" +
           "#cod-tc .s{width:140px;height:140px}" +
           "#cod-tc .k{position:absolute;left:50%;top:50%;width:56px;height:56px;margin:-28px 0 0 -28px;border-radius:50%;" +
           "background:rgba(255,255,255,.45);border:2px solid rgba(255,255,255,.75);pointer-events:none}" +
@@ -439,6 +440,7 @@
         var root = document.createElement("div");
         root.id = "cod-tc";
         root.innerHTML =
+          '<div class="zone-r" id="cod-zone-r"></div>' +
           '<div class="s" data-t="stick"><div class="k" id="cod-k"></div></div>' +
           '<div class="b" data-t="fire">FIRE</div>' +
           '<div class="b" data-t="ads">ADS</div>' +
@@ -515,15 +517,58 @@
             }));
           } catch (e) {}
         }
+        var lookCX = 0, lookCY = 0, lookInit = false;
         function look(dx, dy) {
           var canvas = document.getElementById("canvas") || document.querySelector("canvas");
           if (!canvas) return;
-          var mx = dx * 2.2, my = dy * 2.2;
+          if (!lookInit) {
+            var r = canvas.getBoundingClientRect();
+            lookCX = r.left + r.width / 2;
+            lookCY = r.top + r.height / 2;
+            lookInit = true;
+          }
+          var sens = 2.8;
+          var mx = dx * sens, my = dy * sens;
+          lookCX += mx;
+          lookCY += my;
+          var targets = [canvas, document, window];
           try {
-            canvas.dispatchEvent(new MouseEvent("mousemove", {
-              bubbles: true, cancelable: true, movementX: mx, movementY: my
-            }));
+            if (window.Module && Module.canvas) targets.unshift(Module.canvas);
           } catch (e) {}
+          for (var i = 0; i < targets.length; i++) {
+            var t = targets[i];
+            if (!t) continue;
+            try {
+              var ev = new MouseEvent("mousemove", {
+                bubbles: true,
+                cancelable: true,
+                view: window,
+                clientX: lookCX,
+                clientY: lookCY,
+                screenX: lookCX,
+                screenY: lookCY,
+                movementX: mx,
+                movementY: my
+              });
+              try {
+                Object.defineProperty(ev, "movementX", { get: function () { return mx; } });
+                Object.defineProperty(ev, "movementY", { get: function () { return my; } });
+              } catch (e2) {}
+              t.dispatchEvent(ev);
+            } catch (e) {}
+            try {
+              t.dispatchEvent(new PointerEvent("pointermove", {
+                bubbles: true,
+                cancelable: true,
+                pointerId: 1,
+                pointerType: "touch",
+                clientX: lookCX,
+                clientY: lookCY,
+                movementX: mx,
+                movementY: my
+              }));
+            } catch (e) {}
+          }
         }
 
         var stick = root.querySelector('[data-t="stick"]');
