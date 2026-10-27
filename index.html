@@ -10,7 +10,7 @@
       margin: 0; padding: 0;
       width: 100%; height: 100%;
       overflow: hidden;
-      background: #0c0c10;
+      background: #101018;
       font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
       color: #e8e8e8;
       touch-action: none;
@@ -21,102 +21,161 @@
       position: fixed;
       inset: 0;
       background:
-        linear-gradient(90deg, rgba(80,120,200,0.08) 0%, rgba(80,120,200,0.08) 50%, rgba(200,80,80,0.08) 50%, rgba(200,80,80,0.08) 100%),
-        #101018;
-    }
-    #stage::before {
-      content: "LEFT · move + buttons";
-      position: absolute;
-      left: 12px; top: 50%;
-      transform: translateY(-50%);
-      color: rgba(150,180,255,0.35);
-      font-size: 12px;
-      font-weight: 700;
-      letter-spacing: 0.04em;
-      pointer-events: none;
-      writing-mode: vertical-rl;
-    }
-    #stage::after {
-      content: "RIGHT · look trackpad";
-      position: absolute;
-      right: 12px; top: 50%;
-      transform: translateY(-50%);
-      color: rgba(255,150,150,0.35);
-      font-size: 12px;
-      font-weight: 700;
-      letter-spacing: 0.04em;
-      pointer-events: none;
-      writing-mode: vertical-rl;
+        linear-gradient(90deg,
+          rgba(80,120,200,0.07) 0%, rgba(80,120,200,0.07) 50%,
+          rgba(200,80,80,0.07) 50%, rgba(200,80,80,0.07) 100%);
     }
     #mid-line {
       position: fixed;
       left: 50%; top: 0; bottom: 0;
       width: 1px;
       background: rgba(255,255,255,0.12);
-      z-index: 15;
+      z-index: 5;
       pointer-events: none;
     }
+    #hint-left, #hint-right {
+      position: fixed;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 5;
+      pointer-events: none;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      writing-mode: vertical-rl;
+      opacity: 0.35;
+    }
+    #hint-left { left: 8px; color: #9ab; }
+    #hint-right { right: 8px; color: #c99; }
+
     #panel {
       position: fixed;
-      left: 0; right: 0; top: 0;
+      left: 0; right: 0; bottom: 0;
       z-index: 50;
-      background: rgba(14, 14, 20, 0.96);
-      border-bottom: 1px solid #333;
-      padding: 10px 12px 12px;
-      max-height: 42vh;
+      background: rgba(14, 14, 20, 0.97);
+      border-top: 1px solid #333;
+      padding: 10px 12px 14px;
+      max-height: 38vh;
       overflow: auto;
       -webkit-overflow-scrolling: touch;
       touch-action: pan-y;
+      transition: transform 0.2s ease;
     }
-    #panel h1 { margin: 0 0 4px; font-size: 17px; text-align: center; }
+    body.panel-collapsed #panel {
+      transform: translateY(calc(100% - 48px));
+    }
+    #panel-toggle {
+      display: block;
+      width: 100%;
+      margin: 0 0 8px;
+      padding: 8px;
+      border: 0;
+      border-radius: 8px;
+      background: #2a2a33;
+      color: #ddd;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    #panel h1 {
+      margin: 0 0 4px;
+      font-size: 16px;
+      text-align: center;
+    }
     #panel .hint {
-      margin: 0 auto 10px;
-      max-width: 28em;
+      margin: 0 auto 8px;
+      max-width: 30em;
       text-align: center;
       color: #999;
       font-size: 12px;
       line-height: 1.4;
     }
-    #panel label { display: block; margin: 8px 0 4px; color: #bbb; font-size: 13px; }
+    #panel label {
+      display: block;
+      margin: 8px 0 4px;
+      color: #bbb;
+      font-size: 13px;
+    }
     #panel select, #panel input[type="range"] {
-      width: 100%; max-width: 420px; font-size: 16px;
+      width: 100%;
+      max-width: 420px;
+      font-size: 16px;
     }
+    #fields { max-width: 420px; margin: 0 auto; }
     #panel .row {
-      display: flex; flex-wrap: wrap; gap: 8px;
-      justify-content: center; margin-top: 12px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      margin-top: 10px;
     }
-    #panel button {
-      padding: 10px 14px; min-height: 44px; border: 0; border-radius: 8px;
-      background: #6ec26e; color: #183318; font-weight: 700; font-size: 14px; cursor: pointer;
+    #panel .row button {
+      padding: 10px 14px;
+      min-height: 44px;
+      border: 0;
+      border-radius: 8px;
+      background: #6ec26e;
+      color: #183318;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
     }
-    #panel button.secondary { background: #333; color: #ddd; }
+    #panel .row button.secondary {
+      background: #333;
+      color: #ddd;
+    }
     #copy-status {
-      text-align: center; min-height: 1.2em; margin-top: 8px;
-      font-size: 13px; color: #8d8;
+      text-align: center;
+      min-height: 1.2em;
+      margin-top: 8px;
+      font-size: 12px;
+      color: #8d8;
     }
     #copy-status.err { color: #f88; }
-    #fields { max-width: 420px; margin: 0 auto; }
+
     #touch-controls {
-      position: fixed; inset: 0; z-index: 20; pointer-events: none;
+      position: fixed;
+      inset: 0;
+      z-index: 20;
+      pointer-events: none;
     }
     .tc-btn, .tc-stick-base {
-      position: absolute; pointer-events: auto; touch-action: none;
+      position: absolute;
+      pointer-events: auto;
+      touch-action: none;
       border: 2px solid rgba(255,255,255,0.5);
-      background: rgba(20,20,20,0.4); color: #fff;
-      font-weight: 700; font-size: 12px;
-      display: flex; align-items: center; justify-content: center;
-      text-align: center; text-shadow: 0 1px 2px #000;
+      background: rgba(20,20,20,0.45);
+      color: #fff;
+      font-weight: 700;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      text-shadow: 0 1px 2px #000;
       outline: 2px dashed rgba(255,220,80,0.85);
-      cursor: move; -webkit-tap-highlight-color: transparent;
+      cursor: move;
+      -webkit-tap-highlight-color: transparent;
     }
     .tc-btn {
-      border-radius: 50%; width: 64px; height: 64px;
-      padding: 4px; line-height: 1.1;
+      border-radius: 50%;
+      width: 64px;
+      height: 64px;
+      padding: 4px;
+      line-height: 1.1;
     }
-    .tc-stick-base { border-radius: 50%; width: 140px; height: 140px; }
+    .tc-stick-base {
+      border-radius: 50%;
+      width: 140px;
+      height: 140px;
+    }
     .tc-stick-knob {
-      position: absolute; left: 50%; top: 50%;
-      width: 56px; height: 56px; margin: -28px 0 0 -28px;
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 56px;
+      height: 56px;
+      margin: -28px 0 0 -28px;
       border-radius: 50%;
       background: rgba(255,255,255,0.45);
       border: 2px solid rgba(255,255,255,0.75);
@@ -125,39 +184,15 @@
     .tc-btn.selected, .tc-stick-base.selected {
       outline-color: #6ec26e;
       border-color: rgba(180,255,180,0.9);
-      background: rgba(40,80,40,0.45);
+      background: rgba(40,80,40,0.5);
     }
   </style>
 </head>
 <body>
   <div id="stage"></div>
   <div id="mid-line"></div>
-
-  <div id="panel">
-    <h1>Touch controls layout</h1>
-    <p class="hint">
-      Drag controls to place them. Use the sliders for size and opacity.
-      Then copy the bookmarklet and paste it as a browser bookmark URL.
-      Open a webport and tap the bookmark to inject the controls.
-    </p>
-    <div id="fields">
-      <label for="te-control">Selected control</label>
-      <select id="te-control"></select>
-      <label for="te-size">Size</label>
-      <input id="te-size" type="range" min="40" max="200" value="64">
-      <label for="te-opacity">Opacity</label>
-      <input id="te-opacity" type="range" min="15" max="100" value="40">
-      <label>
-        <input id="te-auto" type="checkbox" checked>
-        Auto-sprint when stick is pushed forward
-      </label>
-    </div>
-    <div class="row">
-      <button type="button" id="btn-copy">Copy COD Touch Controls bookmarklet</button>
-      <button type="button" id="btn-reset" class="secondary">Reset layout</button>
-    </div>
-    <div id="copy-status"></div>
-  </div>
+  <div id="hint-left">LEFT · move</div>
+  <div id="hint-right">RIGHT · look</div>
 
   <div id="touch-controls">
     <div id="tc-stick" class="tc-stick-base" data-tc="stick">
@@ -171,11 +206,35 @@
     <button type="button" class="tc-btn" data-tc="stats">STATS</button>
   </div>
 
+  <div id="panel">
+    <button type="button" id="panel-toggle">Hide panel (edit full screen)</button>
+    <h1>Touch controls layout</h1>
+    <p class="hint">
+      Drag pads anywhere on the screen. Adjust size and opacity, then copy the bookmarklet.
+      Paste it as a bookmark URL, open a webport, and tap the bookmark.
+    </p>
+    <div id="fields">
+      <label for="te-control">Selected control</label>
+      <select id="te-control"></select>
+      <label for="te-size">Size</label>
+      <input id="te-size" type="range" min="40" max="200" value="64">
+      <label for="te-opacity">Opacity</label>
+      <input id="te-opacity" type="range" min="15" max="100" value="40">
+      <label><input id="te-auto" type="checkbox" checked> Auto-sprint when stick is forward</label>
+    </div>
+    <div class="row">
+      <button type="button" id="btn-copy">Copy COD Touch Controls bookmarklet</button>
+      <button type="button" id="btn-test" class="secondary">Test on this page</button>
+      <button type="button" id="btn-reset" class="secondary">Reset layout</button>
+    </div>
+    <div id="copy-status"></div>
+  </div>
+
   <script>
   (function () {
     "use strict";
 
-    const STORAGE = "cod_touch_layout_editor_v2";
+    const STORAGE = "cod_touch_layout_editor_v3";
     const DEFAULTS = {
       autoForward: true,
       stick:  { x: 0.14, y: 0.72, size: 140, opacity: 0.4 },
@@ -202,6 +261,7 @@
     const opEl = document.getElementById("te-opacity");
     const autoEl = document.getElementById("te-auto");
     const statusEl = document.getElementById("copy-status");
+    const panelToggle = document.getElementById("panel-toggle");
 
     function loadLayout() {
       try {
@@ -273,10 +333,9 @@
     function hitControl(x, y) {
       const els = root.querySelectorAll("[data-tc]");
       for (let i = els.length - 1; i >= 0; i--) {
-        const el = els[i];
-        const r = el.getBoundingClientRect();
+        const r = els[i].getBoundingClientRect();
         if (x >= r.left && x <= r.right && y >= r.top && y <= r.bottom) {
-          return el.getAttribute("data-tc");
+          return els[i].getAttribute("data-tc");
         }
       }
       return null;
@@ -298,19 +357,15 @@
       syncSliders();
       ev.preventDefault();
     }
-
     function pointerMove(ev) {
       if (!drag) return;
       const t = ev.changedTouches ? ev.changedTouches[0] : ev;
       const vw = innerWidth || 1, vh = innerHeight || 1;
-      const dx = (t.clientX - drag.ox) / vw;
-      const dy = (t.clientY - drag.oy) / vh;
-      layout[drag.id].x = Math.min(0.95, Math.max(0.05, drag.bx + dx));
-      layout[drag.id].y = Math.min(0.95, Math.max(0.05, drag.by + dy));
+      layout[drag.id].x = Math.min(0.95, Math.max(0.05, drag.bx + (t.clientX - drag.ox) / vw));
+      layout[drag.id].y = Math.min(0.95, Math.max(0.05, drag.by + (t.clientY - drag.oy) / vh));
       applyLayout();
       ev.preventDefault();
     }
-
     function pointerUp() {
       if (!drag) return;
       saveLayout();
@@ -331,15 +386,21 @@
     sel.addEventListener("change", syncSliders);
     sizeEl.addEventListener("input", () => {
       layout[sel.value].size = parseInt(sizeEl.value, 10) || 64;
-      applyLayout();
-      saveLayout();
+      applyLayout(); saveLayout();
     });
     opEl.addEventListener("input", () => {
       layout[sel.value].opacity = (parseInt(opEl.value, 10) || 40) / 100;
-      applyLayout();
-      saveLayout();
+      applyLayout(); saveLayout();
     });
     autoEl.addEventListener("change", saveLayout);
+
+    panelToggle.onclick = () => {
+      document.body.classList.toggle("panel-collapsed");
+      const collapsed = document.body.classList.contains("panel-collapsed");
+      panelToggle.textContent = collapsed
+        ? "Show panel"
+        : "Hide panel (edit full screen)";
+    };
 
     document.getElementById("btn-reset").onclick = () => {
       layout = JSON.parse(JSON.stringify(DEFAULTS));
@@ -352,97 +413,280 @@
       statusEl.className = "";
     };
 
+    /** Runtime injector used by bookmarklet AND Test button */
+    function getInjectorSource(layoutObj) {
+      // One self-contained function body. No nested template hell.
+      return function injectTouchControls(L) {
+        if (window.__codTouchOverlay) {
+          alert("Touch controls already active");
+          return;
+        }
+        window.__codTouchOverlay = 1;
+
+        var css = "#cod-tc{position:fixed;inset:0;z-index:2147483000;pointer-events:none;touch-action:none}" +
+          "#cod-tc .b,#cod-tc .s{position:absolute;pointer-events:auto;touch-action:none;border:2px solid rgba(255,255,255,.45);" +
+          "background:rgba(20,20,20,.35);color:#fff;font:700 12px system-ui;display:flex;align-items:center;justify-content:center;" +
+          "text-align:center;border-radius:50%;text-shadow:0 1px 2px #000}" +
+          "#cod-tc .s{width:140px;height:140px}" +
+          "#cod-tc .k{position:absolute;left:50%;top:50%;width:56px;height:56px;margin:-28px 0 0 -28px;border-radius:50%;" +
+          "background:rgba(255,255,255,.45);border:2px solid rgba(255,255,255,.75);pointer-events:none}" +
+          "#cod-tc .b.active{background:rgba(110,194,110,.55)}";
+
+        var st = document.createElement("style");
+        st.textContent = css;
+        document.documentElement.appendChild(st);
+
+        var root = document.createElement("div");
+        root.id = "cod-tc";
+        root.innerHTML =
+          '<div class="s" data-t="stick"><div class="k" id="cod-k"></div></div>' +
+          '<div class="b" data-t="fire">FIRE</div>' +
+          '<div class="b" data-t="ads">ADS</div>' +
+          '<div class="b" data-t="reload">RLD</div>' +
+          '<div class="b" data-t="jump">JUMP</div>' +
+          '<div class="b" data-t="stance">STANCE</div>' +
+          '<div class="b" data-t="stats">STATS</div>';
+        document.documentElement.appendChild(root);
+
+        var tb = document.createElement("button");
+        tb.textContent = "Hide pads";
+        tb.setAttribute("type", "button");
+        tb.style.cssText = "position:fixed;left:10px;top:10px;z-index:2147483001;padding:8px 12px;border:0;border-radius:20px;background:rgba(30,30,30,.9);color:#fff;font:700 13px system-ui;";
+        document.documentElement.appendChild(tb);
+        var hid = false;
+        tb.onclick = function () {
+          hid = !hid;
+          root.style.display = hid ? "none" : "block";
+          tb.textContent = hid ? "Show pads" : "Hide pads";
+          tb.style.background = hid ? "rgba(110,194,110,.9)" : "rgba(30,30,30,.9)";
+          tb.style.color = hid ? "#183318" : "#fff";
+        };
+
+        function apply() {
+          var vw = innerWidth, vh = innerHeight;
+          var nodes = root.querySelectorAll("[data-t]");
+          for (var i = 0; i < nodes.length; i++) {
+            var el = nodes[i];
+            var id = el.getAttribute("data-t");
+            var c = L[id];
+            if (!c) continue;
+            var s = c.size || 64;
+            el.style.width = s + "px";
+            el.style.height = s + "px";
+            el.style.opacity = String(c.opacity != null ? c.opacity : 0.4);
+            el.style.left = Math.max(0, c.x * vw - s / 2) + "px";
+            el.style.top = Math.max(0, c.y * vh - s / 2) + "px";
+          }
+        }
+
+        function kc(c) {
+          var m = { KeyW:87, KeyA:65, KeyS:83, KeyD:68, Space:32, ControlLeft:17, KeyR:82, ShiftLeft:16, Tab:9 };
+          return m[c] || 0;
+        }
+        var down = {};
+        function key(code, keyName, isDown) {
+          var type = isDown ? "keydown" : "keyup";
+          if (isDown) {
+            if (down[code]) return;
+            down[code] = 1;
+          } else {
+            if (!down[code]) return;
+            delete down[code];
+          }
+          var canvas = document.getElementById("canvas") || document.querySelector("canvas");
+          var targets = [canvas, document, window].filter(Boolean);
+          for (var i = 0; i < targets.length; i++) {
+            try {
+              targets[i].dispatchEvent(new KeyboardEvent(type, {
+                key: keyName, code: code, keyCode: kc(code), which: kc(code),
+                bubbles: true, cancelable: true
+              }));
+            } catch (e) {}
+          }
+        }
+        function mouse(isDown, btn) {
+          var canvas = document.getElementById("canvas") || document.querySelector("canvas");
+          if (!canvas) return;
+          try {
+            canvas.dispatchEvent(new MouseEvent(isDown ? "mousedown" : "mouseup", {
+              bubbles: true, cancelable: true, button: btn,
+              buttons: isDown ? (btn === 0 ? 1 : 2) : 0,
+              clientX: innerWidth * 0.75, clientY: innerHeight * 0.5
+            }));
+          } catch (e) {}
+        }
+        function look(dx, dy) {
+          var canvas = document.getElementById("canvas") || document.querySelector("canvas");
+          if (!canvas) return;
+          var mx = dx * 2.2, my = dy * 2.2;
+          try {
+            canvas.dispatchEvent(new MouseEvent("mousemove", {
+              bubbles: true, cancelable: true, movementX: mx, movementY: my
+            }));
+          } catch (e) {}
+        }
+
+        var stick = root.querySelector('[data-t="stick"]');
+        var knob = document.getElementById("cod-k");
+        function setKnob(nx, ny) {
+          var s = (L.stick && L.stick.size) || 140;
+          knob.style.transform = "translate(" + (nx * s * 0.33) + "px," + (ny * s * 0.33) + "px)";
+        }
+        function stickTo(nx, ny) {
+          var d = 0.18, f = -ny, r = nx, m = Math.hypot(nx, ny);
+          setKnob(nx, ny);
+          key("KeyW", "w", f > d);
+          key("KeyS", "s", f < -d);
+          key("KeyA", "a", r < -d);
+          key("KeyD", "d", r > d);
+          key("ShiftLeft", "Shift", !!(L.autoForward && f > d && m > 0.55));
+        }
+        function press(id, on) {
+          var el = root.querySelector('[data-t="' + id + '"]');
+          if (el) el.classList.toggle("active", !!on);
+          if (id === "fire") mouse(on, 0);
+          else if (id === "ads") mouse(on, 2);
+          else if (id === "reload") key("KeyR", "r", on);
+          else if (id === "jump") key("Space", " ", on);
+          else if (id === "stance") key("ControlLeft", "Control", on);
+          else if (id === "stats") key("Tab", "Tab", on);
+        }
+
+        var sid = null, lt = {}, ab = {};
+        function hit(x, y) {
+          var n = root.querySelectorAll("[data-t]");
+          for (var i = n.length - 1; i >= 0; i--) {
+            var r = n[i].getBoundingClientRect();
+            if (x >= r.left && x <= r.right && y >= r.top && y <= r.bottom) {
+              return n[i].getAttribute("data-t");
+            }
+          }
+          return null;
+        }
+        function ms(x, y) {
+          var r = stick.getBoundingClientRect();
+          var dx = (x - (r.left + r.width / 2)) / (r.width / 2);
+          var dy = (y - (r.top + r.height / 2)) / (r.height / 2);
+          var m = Math.hypot(dx, dy);
+          if (m > 1) { dx /= m; dy /= m; }
+          stickTo(dx, dy);
+        }
+
+        root.addEventListener("touchstart", function (ev) {
+          for (var i = 0; i < ev.changedTouches.length; i++) {
+            var t = ev.changedTouches[i], x = t.clientX, y = t.clientY;
+            var c = hit(x, y), half = innerWidth / 2;
+            if (c === "stick") {
+              sid = t.identifier; ms(x, y); ev.preventDefault();
+            } else if (c) {
+              ab[t.identifier] = c; press(c, true);
+              if (x >= half) lt[t.identifier] = { x: x, y: y };
+              ev.preventDefault();
+            } else if (x < half) {
+              var r = stick.getBoundingClientRect();
+              var cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+              if (Math.hypot(x - cx, y - cy) < Math.max(r.width, 120)) {
+                sid = t.identifier; ms(x, y); ev.preventDefault();
+              }
+            } else if (x >= half) {
+              lt[t.identifier] = { x: x, y: y };
+              ev.preventDefault();
+            }
+          }
+        }, { passive: false });
+
+        window.addEventListener("touchmove", function (ev) {
+          for (var i = 0; i < ev.changedTouches.length; i++) {
+            var t = ev.changedTouches[i];
+            if (t.identifier === sid) {
+              ms(t.clientX, t.clientY); ev.preventDefault();
+            } else if (lt[t.identifier]) {
+              var p = lt[t.identifier];
+              look(t.clientX - p.x, t.clientY - p.y);
+              lt[t.identifier] = { x: t.clientX, y: t.clientY };
+              ev.preventDefault();
+            }
+          }
+        }, { passive: false });
+
+        function endTouch(ev) {
+          for (var i = 0; i < ev.changedTouches.length; i++) {
+            var t = ev.changedTouches[i];
+            if (t.identifier === sid) { sid = null; stickTo(0, 0); }
+            if (lt[t.identifier]) delete lt[t.identifier];
+            if (ab[t.identifier]) {
+              press(ab[t.identifier], false);
+              delete ab[t.identifier];
+            }
+          }
+        }
+        window.addEventListener("touchend", endTouch, { passive: false });
+        window.addEventListener("touchcancel", endTouch, { passive: false });
+
+        apply();
+        window.addEventListener("resize", apply);
+      }.toString();
+    }
+
     function buildBookmarklet() {
       saveLayout();
       const L = JSON.parse(JSON.stringify(layout));
       L.autoForward = !!autoEl.checked;
-      const layoutJson = JSON.stringify(L);
 
-      const src =
-        "(function(){" +
-        "if(window.__codTouchOverlay){alert('Touch controls already active');return;}" +
-        "window.__codTouchOverlay=1;" +
-        "var L=" + layoutJson + ";" +
-        "var css='#cod-tc{position:fixed;inset:0;z-index:2147483000;pointer-events:none;touch-action:none}" +
-        "#cod-tc .b,#cod-tc .s{position:absolute;pointer-events:auto;touch-action:none;border:2px solid rgba(255,255,255,.45);" +
-        "background:rgba(20,20,20,.35);color:#fff;font:700 12px system-ui;display:flex;align-items:center;justify-content:center;" +
-        "text-align:center;border-radius:50%;text-shadow:0 1px 2px #000}" +
-        "#cod-tc .s{width:140px;height:140px}" +
-        "#cod-tc .k{position:absolute;left:50%;top:50%;width:56px;height:56px;margin:-28px 0 0 -28px;border-radius:50%;" +
-        "background:rgba(255,255,255,.45);border:2px solid rgba(255,255,255,.75);pointer-events:none}" +
-        "#cod-tc .b.active{background:rgba(110,194,110,.55)}';" +
-        "var st=document.createElement('style');st.textContent=css;document.documentElement.appendChild(st);" +
-        "var root=document.createElement('div');root.id='cod-tc';" +
-        "root.innerHTML='<div class=\"s\" data-t=\"stick\"><div class=\"k\" id=\"cod-k\"></div></div>" +
-        "<div class=\"b\" data-t=\"fire\">FIRE</div><div class=\"b\" data-t=\"ads\">ADS</div>" +
-        "<div class=\"b\" data-t=\"reload\">RLD</div><div class=\"b\" data-t=\"jump\">JUMP</div>" +
-        "<div class=\"b\" data-t=\"stance\">STANCE</div><div class=\"b\" data-t=\"stats\">STATS</div>';" +
-        "document.documentElement.appendChild(root);" +
-        "var tb=document.createElement('button');tb.textContent='Hide pads';" +
-        "tb.style.cssText='position:fixed;left:10px;top:10px;z-index:2147483001;padding:8px 12px;border:0;border-radius:20px;" +
-        "background:rgba(30,30,30,.9);color:#fff;font:700 13px system-ui';" +
-        "document.documentElement.appendChild(tb);var hid=false;" +
-        "tb.onclick=function(){hid=!hid;root.style.display=hid?'none':'block';" +
-        "tb.textContent=hid?'Show pads':'Hide pads';" +
-        "tb.style.background=hid?'rgba(110,194,110,.9)':'rgba(30,30,30,.9)';" +
-        "tb.style.color=hid?'#183318':'#fff';};" +
-        "function apply(){var vw=innerWidth,vh=innerHeight;" +
-        "root.querySelectorAll('[data-t]').forEach(function(el){var id=el.getAttribute('data-t'),c=L[id];if(!c)return;" +
-        "var s=c.size||64;el.style.width=s+'px';el.style.height=s+'px';" +
-        "el.style.opacity=String(c.opacity!=null?c.opacity:.4);" +
-        "el.style.left=Math.max(0,c.x*vw-s/2)+'px';el.style.top=Math.max(0,c.y*vh-s/2)+'px';});}" +
-        "function kc(c){return({KeyW:87,KeyA:65,KeyS:83,KeyD:68,Space:32,ControlLeft:17,KeyR:82,ShiftLeft:16,Tab:9})[c]||0}" +
-        "var down={};" +
-        "function key(code,key,isDown){var type=isDown?'keydown':'keyup';if(isDown){if(down[code])return;down[code]=1}" +
-        "else{if(!down[code])return;delete down[code]}" +
-        "var canvas=document.getElementById('canvas')||document.querySelector('canvas');" +
-        "var targets=[canvas,document,window].filter(Boolean);" +
-        "targets.forEach(function(t){try{t.dispatchEvent(new KeyboardEvent(type,{key:key,code:code,keyCode:kc(code),which:kc(code),bubbles:true,cancelable:true}))}catch(e){}})}" +
-        "function mouse(isDown,btn){var canvas=document.getElementById('canvas')||document.querySelector('canvas');if(!canvas)return;" +
-        "try{canvas.dispatchEvent(new MouseEvent(isDown?'mousedown':'mouseup',{bubbles:true,cancelable:true,button:btn,buttons:isDown?(btn===0?1:2):0,clientX:innerWidth*.75,clientY:innerHeight*.5}))}catch(e){}}" +
-        "function look(dx,dy){var canvas=document.getElementById('canvas')||document.querySelector('canvas');if(!canvas)return;" +
-        "var mx=dx*2.2,my=dy*2.2;try{canvas.dispatchEvent(new MouseEvent('mousemove',{bubbles:true,cancelable:true,movementX:mx,movementY:my}))}catch(e){}}" +
-        "var stick=root.querySelector('[data-t=stick]'),knob=document.getElementById('cod-k');" +
-        "function setKnob(nx,ny){var s=(L.stick&&L.stick.size)||140;knob.style.transform='translate('+(nx*s*.33)+'px,'+(ny*s*.33)+'px')}" +
-        "function stickTo(nx,ny){var d=.18,f=-ny,r=nx,m=Math.hypot(nx,ny);setKnob(nx,ny);" +
-        "key('KeyW','w',f>d);key('KeyS','s',f<-d);key('KeyA','a',r<-d);key('KeyD','d',r>d);" +
-        "key('ShiftLeft','Shift',!!(L.autoForward&&f>d&&m>.55))}" +
-        "function press(id,on){var el=root.querySelector('[data-t=\"'+id+'\"]');if(el)el.classList.toggle('active',!!on);" +
-        "if(id==='fire')mouse(on,0);else if(id==='ads')mouse(on,2);else if(id==='reload')key('KeyR','r',on);" +
-        "else if(id==='jump')key('Space',' ',on);else if(id==='stance')key('ControlLeft','Control',on);" +
-        "else if(id==='stats')key('Tab','Tab',on)}" +
-        "var sid=null,lt={},ab={};" +
-        "function hit(x,y){var n=root.querySelectorAll('[data-t]');for(var i=n.length-1;i>=0;i--){" +
-        "var r=n[i].getBoundingClientRect();if(x>=r.left&&x<=r.right&&y>=r.top&&y<=r.bottom)return n[i].getAttribute('data-t')}return null}" +
-        "function ms(x,y){var r=stick.getBoundingClientRect();var dx=(x-(r.left+r.width/2))/(r.width/2)," +
-        "dy=(y-(r.top+r.height/2))/(r.height/2);var m=Math.hypot(dx,dy);if(m>1){dx/=m;dy/=m}stickTo(dx,dy)}" +
-        "root.addEventListener('touchstart',function(ev){for(var i=0;i<ev.changedTouches.length;i++){" +
-        "var t=ev.changedTouches[i],x=t.clientX,y=t.clientY,c=hit(x,y),half=innerWidth/2;" +
-        "if(c==='stick'){sid=t.identifier;ms(x,y);ev.preventDefault()}" +
-        "else if(c){ab[t.identifier]=c;press(c,true);if(x>=half)lt[t.identifier]={x:x,y:y};ev.preventDefault()}" +
-        "else if(x<half){var r=stick.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2;" +
-        "if(Math.hypot(x-cx,y-cy)<Math.max(r.width,120)){sid=t.identifier;ms(x,y);ev.preventDefault()}}" +
-        "else if(x>=half){lt[t.identifier]={x:x,y:y};ev.preventDefault()}}}, {passive:false});" +
-        "window.addEventListener('touchmove',function(ev){for(var i=0;i<ev.changedTouches.length;i++){" +
-        "var t=ev.changedTouches[i];if(t.identifier===sid){ms(t.clientX,t.clientY);ev.preventDefault()}" +
-        "else if(lt[t.identifier]){var p=lt[t.identifier];look(t.clientX-p.x,t.clientY-p.y);" +
-        "lt[t.identifier]={x:t.clientX,y:t.clientY};ev.preventDefault()}}}, {passive:false});" +
-        "window.addEventListener('touchend',function(ev){for(var i=0;i<ev.changedTouches.length;i++){" +
-        "var t=ev.changedTouches[i];if(t.identifier===sid){sid=null;stickTo(0,0)}" +
-        "if(lt[t.identifier])delete lt[t.identifier];" +
-        "if(ab[t.identifier]){press(ab[t.identifier],false);delete ab[t.identifier]}}}, {passive:false});" +
-        "window.addEventListener('touchcancel',function(ev){for(var i=0;i<ev.changedTouches.length;i++){" +
-        "var t=ev.changedTouches[i];if(t.identifier===sid){sid=null;stickTo(0,0)}" +
-        "if(lt[t.identifier])delete lt[t.identifier];" +
-        "if(ab[t.identifier]){press(ab[t.identifier],false);delete ab[t.identifier]}}}, {passive:false});" +
-        "apply();window.addEventListener('resize',apply);" +
-        "})();";
+      // Bookmarklet: (function(L){ ...injector... })({...layout...});
+      const fn = getInjectorSource();
+      // fn is "function injectTouchControls(L) { ... }"
+      // Wrap: (function(L){ ...body... })(LAYOUT)
+      const bodyMatch = fn.match(/^function\s+\w+\s*\(\s*L\s*\)\s*\{([\s\S]*)\}$/);
+      if (!bodyMatch) {
+        throw new Error("injector parse failed");
+      }
+      const body = bodyMatch[1];
+      const code = "(function(L){" + body + "})(" + JSON.stringify(L) + ");";
+      return "javascript:" + encodeURIComponent(code);
+    }
 
-      return "javascript:" + encodeURIComponent(src);
+    function runTest() {
+      saveLayout();
+      const L = JSON.parse(JSON.stringify(layout));
+      L.autoForward = !!autoEl.checked;
+      // Remove previous test instance
+      try {
+        window.__codTouchOverlay = 0;
+        const old = document.getElementById("cod-tc");
+        if (old) old.remove();
+        document.querySelectorAll("body > button").forEach(() => {});
+      } catch (e) {}
+      const fn = getInjectorSource();
+      // eslint-disable-next-line no-new-func
+      const inject = new Function("return (" + fn + ");")();
+      inject(L);
+      statusEl.textContent = "Injected on this page. Use Hide pads / reload to clear.";
+      statusEl.className = "";
     }
 
     async function copyBookmarklet() {
-      const url = buildBookmarklet();
+      let url;
+      try {
+        url = buildBookmarklet();
+      } catch (e) {
+        statusEl.textContent = "Build failed: " + (e && e.message);
+        statusEl.className = "err";
+        return;
+      }
+      // Validate: decode and Function-parse
+      try {
+        const decoded = decodeURIComponent(url.replace(/^javascript:/i, ""));
+        // should be valid JS
+        // eslint-disable-next-line no-new-func
+        new Function(decoded);
+      } catch (e) {
+        statusEl.textContent = "Bookmarklet syntax error: " + (e && e.message);
+        statusEl.className = "err";
+        console.error(e);
+        return;
+      }
+
       statusEl.className = "";
       try {
         if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -450,7 +694,6 @@
         } else {
           const ta = document.createElement("textarea");
           ta.value = url;
-          ta.setAttribute("readonly", "");
           ta.style.position = "fixed";
           ta.style.left = "-9999px";
           document.body.appendChild(ta);
@@ -459,19 +702,15 @@
           document.body.removeChild(ta);
         }
         statusEl.textContent =
-          "Copied. Create a bookmark and paste this as the URL/address.";
+          "Copied (" + Math.round(url.length / 1024) + " KB). New bookmark → paste as URL.";
       } catch (e) {
-        try {
-          window.prompt("Copy this bookmarklet URL:", url);
-          statusEl.textContent = "Copy the text from the prompt into a bookmark URL.";
-        } catch (e2) {
-          statusEl.textContent = "Could not copy automatically.";
-          statusEl.className = "err";
-        }
+        window.prompt("Copy this bookmarklet:", url);
+        statusEl.textContent = "Copy the text from the dialog into a bookmark URL.";
       }
     }
 
     document.getElementById("btn-copy").onclick = copyBookmarklet;
+    document.getElementById("btn-test").onclick = runTest;
     window.addEventListener("resize", applyLayout);
 
     fillSelect();
