@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-  <title>Universal FPS Touch Controls</title>
+  <title>Universal FPS Webport Touch Overlay</title>
   <style>
     * { box-sizing: border-box; }
     html, body {
@@ -187,6 +187,34 @@
     }
     body.bar-open #fab-toggle { top: 62px; }
 
+    #fab-controls {
+      position: fixed;
+      left: 10px;
+      top: 10px;
+      z-index: 110;
+      min-width: 42px;
+      height: 42px;
+      padding: 0 12px;
+      border-radius: 21px;
+      border: 0;
+      background: rgba(30,30,30,0.85);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    body.bar-open #fab-controls { top: 62px; }
+    body.controls-hidden #touch-controls {
+      display: none !important;
+      pointer-events: none !important;
+    }
+    body.controls-hidden #fab-controls {
+      background: rgba(110, 194, 110, 0.9);
+      color: #183318;
+    }
+
+
     #editor {
       display: none;
       position: fixed;
@@ -241,10 +269,11 @@
     <button type="button" id="btn-hide" class="secondary">Hide bar</button>
   </div>
 
+  <button type="button" id="fab-controls" title="Hide or show touch controls">Hide pads</button>
   <button type="button" id="fab-toggle" title="Show bar">☰</button>
 
   <div id="hint">
-    <strong>FPS webport touch overlay</strong><br><br>
+    <strong>Universal FPS webport touch overlay</strong><br><br>
     Paste a webport URL and press Load.<br>
     Left half = move + buttons · Right half = look.
   </div>
@@ -794,7 +823,7 @@ var css='#cod-tc{position:fixed;inset:0;z-index:2147483000;pointer-events:none;t
 var st=document.createElement('style');st.textContent=css;document.documentElement.appendChild(st);
 var root=document.createElement('div');root.id='cod-tc';
 root.innerHTML='<div class="s" data-t="stick"><div class="k" id="cod-k"></div></div><div class="b" data-t="fire">FIRE</div><div class="b" data-t="ads">ADS</div><div class="b" data-t="reload">RLD</div><div class="b" data-t="jump">JUMP</div><div class="b" data-t="stance">STANCE</div><div class="b" data-t="stats">STATS</div>';
-document.documentElement.appendChild(root);
+document.documentElement.appendChild(root);var tb=document.createElement('button');tb.textContent='Hide pads';tb.style.cssText='position:fixed;left:10px;top:10px;z-index:2147483001;padding:8px 12px;border:0;border-radius:20px;background:rgba(30,30,30,.9);color:#fff;font:700 13px system-ui';document.documentElement.appendChild(tb);var hid=false;tb.onclick=function(){hid=!hid;root.style.display=hid?'none':'block';tb.textContent=hid?'Show pads':'Hide pads';tb.style.background=hid?'rgba(110,194,110,.9)':'rgba(30,30,30,.9)';tb.style.color=hid?'#183318':'#fff';};
 function save(){try{localStorage.setItem(S,JSON.stringify(L));}catch(e){}}
 function apply(){var vw=innerWidth,vh=innerHeight;root.querySelectorAll('[data-t]').forEach(function(el){var id=el.getAttribute('data-t');var c=L[id];if(!c)return;var s=c.size||64;el.style.width=s+'px';el.style.height=s+'px';el.style.opacity=String(c.opacity!=null?c.opacity:.4);el.style.left=Math.max(0,c.x*vw-s/2)+'px';el.style.top=Math.max(0,c.y*vh-s/2)+'px';});}
 function kc(c){return({KeyW:87,KeyA:65,KeyS:83,KeyD:68,Space:32,ControlLeft:17,KeyR:82,ShiftLeft:16,Tab:9,KeyV:86})[c]||0;}
@@ -821,6 +850,31 @@ apply();window.addEventListener('resize',apply);save();
     }
 
     document.getElementById("bookmarklet").href = buildBookmarklet();
+
+
+    // Hide / show touch pads so the webport menu is usable
+    const fabControls = document.getElementById("fab-controls");
+    let controlsHidden = false;
+    try {
+      controlsHidden = sessionStorage.getItem("cod_touch_hidden") === "1";
+    } catch (e) {}
+    function syncControlsHidden() {
+      document.body.classList.toggle("controls-hidden", controlsHidden);
+      if (fabControls) {
+        fabControls.textContent = controlsHidden ? "Show pads" : "Hide pads";
+      }
+      if (controlsHidden) releaseAll();
+    }
+    if (fabControls) {
+      fabControls.onclick = () => {
+        controlsHidden = !controlsHidden;
+        try {
+          sessionStorage.setItem("cod_touch_hidden", controlsHidden ? "1" : "0");
+        } catch (e) {}
+        syncControlsHidden();
+      };
+    }
+    syncControlsHidden();
 
     window.addEventListener("resize", applyLayout);
     applyLayout();
