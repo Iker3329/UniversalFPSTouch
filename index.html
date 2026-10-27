@@ -242,11 +242,11 @@
     #ghost-type {
       position: fixed;
       left: 0;
-      right: 0;
+      right: 72px;
       bottom: 0;
       z-index: 115;
-      width: 100%;
-      max-width: 100%;
+      width: auto;
+      max-width: none;
       padding: 12px 14px;
       font-size: 16px; /* prevents iOS zoom */
       border: 0;
@@ -255,6 +255,12 @@
       color: #fff;
       display: none;
       box-sizing: border-box;
+    }
+    #ghost-send {
+      display: none;
+    }
+    body.keyboard-open #ghost-send {
+      display: block !important;
     }
     body.keyboard-open #ghost-type {
       display: block;
@@ -932,7 +938,7 @@ var css='#cod-tc{position:fixed;inset:0;z-index:2147483000;pointer-events:none;t
 var st=document.createElement('style');st.textContent=css;document.documentElement.appendChild(st);
 var root=document.createElement('div');root.id='cod-tc';
 root.innerHTML='<div class="s" data-t="stick"><div class="k" id="cod-k"></div></div><div class="b" data-t="fire">FIRE</div><div class="b" data-t="ads">ADS</div><div class="b" data-t="reload">RLD</div><div class="b" data-t="jump">JUMP</div><div class="b" data-t="stance">STANCE</div><div class="b" data-t="stats">STATS</div>';
-document.documentElement.appendChild(root);var tb=document.createElement('button');tb.textContent='Hide pads';tb.style.cssText='position:fixed;left:10px;top:10px;z-index:2147483001;padding:8px 12px;border:0;border-radius:20px;background:rgba(30,30,30,.9);color:#fff;font:700 13px system-ui';document.documentElement.appendChild(tb);var hid=false;tb.onclick=function(){hid=!hid;root.style.display=hid?'none':'block';tb.textContent=hid?'Show pads':'Hide pads';tb.style.background=hid?'rgba(110,194,110,.9)':'rgba(30,30,30,.9)';tb.style.color=hid?'#183318':'#fff';};var kb=document.createElement('button');kb.textContent='\u2328';kb.title='Keyboard';kb.style.cssText='position:fixed;left:10px;bottom:10px;z-index:2147483001;width:48px;height:48px;border:0;border-radius:50%;background:rgba(30,30,30,.9);color:#fff;font:22px system-ui';document.documentElement.appendChild(kb);var gi=document.createElement('input');gi.type='text';gi.autocomplete='off';gi.spellcheck=false;gi.placeholder='Type here (profile name, etc.)';gi.style.cssText='position:fixed;left:0;right:0;bottom:0;z-index:2147483002;width:100%;padding:12px 14px;font-size:16px;border:0;border-top:1px solid #444;background:rgba(16,14,20,.96);color:#fff;display:none;box-sizing:border-box';document.documentElement.appendChild(gi);var kopen=false;function setKB(on){kopen=!!on;gi.style.display=kopen?'block':'none';kb.style.background=kopen?'rgba(110,194,110,.95)':'rgba(30,30,30,.9)';kb.style.color=kopen?'#183318':'#fff';if(kopen){gi.value='';setTimeout(function(){try{gi.focus()}catch(e){}},50)}else{try{gi.blur()}catch(e){}}}kb.onclick=function(e){e.preventDefault();e.stopPropagation();setKB(!kopen)};function fwd(type,key,code,kc){var canvas=document.getElementById('canvas')||document.querySelector('canvas');var targets=[canvas,document,window].filter(Boolean);targets.forEach(function(t){try{var ev=new KeyboardEvent(type,{key:key,code:code,keyCode:kc,which:kc,bubbles:true,cancelable:true});t.dispatchEvent(ev)}catch(e){}})}gi.addEventListener('keydown',function(e){var sp={Backspace:['Backspace','Backspace',8],Enter:['Enter','Enter',13],Escape:['Escape','Escape',27]};if(sp[e.key]){var x=sp[e.key];fwd('keydown',x[0],x[1],x[2])}});gi.addEventListener('input',function(){var v=gi.value;if(!v)return;for(var i=0;i<v.length;i++){var ch=v[i],k=ch,c='',kc=ch.charCodeAt(0);if(ch===' '){c='Space';kc=32}else if(ch>='a'&&ch<='z'){c='Key'+ch.toUpperCase()}else if(ch>='A'&&ch<='Z'){c='Key'+ch}else if(ch>='0'&&ch<='9'){c='Digit'+ch}fwd('keydown',k,c,kc);fwd('keyup',k,c,kc)}gi.value=''});gi.addEventListener('blur',function(){setTimeout(function(){if(kopen&&document.activeElement!==gi){kopen=false;gi.style.display='none';kb.style.background='rgba(30,30,30,.9)';kb.style.color='#fff'}},200)});
+document.documentElement.appendChild(root);var tb=document.createElement('button');tb.textContent='Hide pads';tb.style.cssText='position:fixed;left:10px;top:10px;z-index:2147483001;padding:8px 12px;border:0;border-radius:20px;background:rgba(30,30,30,.9);color:#fff;font:700 13px system-ui';document.documentElement.appendChild(tb);var hid=false;tb.onclick=function(){hid=!hid;root.style.display=hid?'none':'block';tb.textContent=hid?'Show pads':'Hide pads';tb.style.background=hid?'rgba(110,194,110,.9)':'rgba(30,30,30,.9)';tb.style.color=hid?'#183318':'#fff';};var kb=document.createElement('button');kb.textContent='\u2328';kb.title='Keyboard';kb.style.cssText='position:fixed;left:10px;bottom:10px;z-index:2147483001;width:48px;height:48px;border:0;border-radius:50%;background:rgba(30,30,30,.9);color:#fff;font:22px system-ui';document.documentElement.appendChild(kb);var gi=document.createElement('input');gi.type='text';gi.autocomplete='off';gi.spellcheck=false;gi.placeholder='Type name, then Send';gi.style.cssText='position:fixed;left:0;right:72px;bottom:0;z-index:2147483002;padding:12px 14px;font-size:16px;border:0;border-top:1px solid #444;background:rgba(16,14,20,.96);color:#fff;display:none;box-sizing:border-box';document.documentElement.appendChild(gi);var sb=document.createElement('button');sb.textContent='Send';sb.style.cssText='position:fixed;right:8px;bottom:8px;z-index:2147483003;padding:10px 14px;border:0;border-radius:8px;background:#6ec26e;color:#183318;font:700 15px system-ui;display:none';document.documentElement.appendChild(sb);var kopen=false;function gTargets(){var a=[],c=document.getElementById('canvas')||document.querySelector('canvas');if(c)a.push(c);try{if(window.Module&&Module.canvas)a.push(Module.canvas)}catch(e){}a.push(document.body,document,window);return a}function focusC(){var c=document.getElementById('canvas')||document.querySelector('canvas');try{if(c&&c.focus)c.focus({preventScroll:true})}catch(e){}}function fire(type,key,code,kc,cc){var targets=gTargets();for(var i=0;i<targets.length;i++){try{var ev=new KeyboardEvent(type,{key:key,code:code||'',keyCode:kc|0,which:kc|0,charCode:cc|0,bubbles:true,cancelable:true,composed:true});targets[i].dispatchEvent(ev)}catch(e){}}}function injChar(ch){var key=ch,code='',kc=ch.charCodeAt(0),cc=kc;if(ch===' '){code='Space';kc=32;cc=32}else if(ch>='a'&&ch<='z'){code='Key'+ch.toUpperCase();kc=ch.toUpperCase().charCodeAt(0)}else if(ch>='A'&&ch<='Z'){code='Key'+ch}else if(ch>='0'&&ch<='9'){code='Digit'+ch}focusC();fire('keydown',key,code,kc,cc);fire('keypress',key,code,cc,cc);fire('keyup',key,code,kc,0)}function injSpecial(n){var m={Backspace:['Backspace','Backspace',8],Enter:['Enter','Enter',13]};var x=m[n];if(!x)return;focusC();fire('keydown',x[0],x[1],x[2],0);if(n==='Enter')fire('keypress',x[0],x[1],x[2],x[2]);fire('keyup',x[0],x[1],x[2],0)}function setKB(on){kopen=!!on;gi.style.display=kopen?'block':'none';sb.style.display=kopen?'block':'none';kb.style.background=kopen?'rgba(110,194,110,.95)':'rgba(30,30,30,.9)';kb.style.color=kopen?'#183318':'#fff';if(kopen){gi.value='';setTimeout(function(){try{gi.focus()}catch(e){}},50)}else{try{gi.blur()}catch(e){}}}kb.onclick=function(e){e.preventDefault();e.stopPropagation();setKB(!kopen)};sb.onclick=function(e){e.preventDefault();e.stopPropagation();var t=gi.value||'';if(t){for(var i=0;i<t.length;i++)injChar(t[i]);gi.value=''}injSpecial('Enter');setTimeout(function(){try{gi.focus()}catch(e){}},50)};gi.addEventListener('keydown',function(e){if(e.key==='Backspace')injSpecial('Backspace');if(e.key==='Enter'){e.preventDefault();var t=gi.value||'';if(t){for(var i=0;i<t.length;i++)injChar(t[i]);gi.value=''}injSpecial('Enter')}});gi.addEventListener('beforeinput',function(e){if(e.inputType==='insertText'&&e.data)injChar(e.data);else if(e.inputType==='deleteContentBackward')injSpecial('Backspace')});gi.addEventListener('input',function(){var v=gi.value;if(!v)return;for(var i=0;i<v.length;i++)injChar(v[i]);gi.value=''});
 function save(){try{localStorage.setItem(S,JSON.stringify(L));}catch(e){}}
 function apply(){var vw=innerWidth,vh=innerHeight;root.querySelectorAll('[data-t]').forEach(function(el){var id=el.getAttribute('data-t');var c=L[id];if(!c)return;var s=c.size||64;el.style.width=s+'px';el.style.height=s+'px';el.style.opacity=String(c.opacity!=null?c.opacity:.4);el.style.left=Math.max(0,c.x*vw-s/2)+'px';el.style.top=Math.max(0,c.y*vh-s/2)+'px';});}
 function kc(c){return({KeyW:87,KeyA:65,KeyS:83,KeyD:68,Space:32,ControlLeft:17,KeyR:82,ShiftLeft:16,Tab:9,KeyV:86})[c]||0;}
@@ -986,143 +992,324 @@ apply();window.addEventListener('resize',apply);save();
     syncControlsHidden();
 
 
-    // Phone keyboard helper — focus a real input so the OS keyboard opens,
-    // then forward keys into the game (iframe or same page via bookmarklet).
+    
+    // Phone keyboard helper — mobile OS keyboard + aggressive key injection
+    // for Emscripten/SDL canvas games (profile names, etc.).
     const fabKeyboard = document.getElementById("fab-keyboard");
     const ghostType = document.getElementById("ghost-type");
     let keyboardOpen = false;
+    let typingBusy = false;
 
-    function setKeyboardOpen(on) {
-      keyboardOpen = !!on;
-      document.body.classList.toggle("keyboard-open", keyboardOpen);
-      if (!ghostType) return;
-      if (keyboardOpen) {
-        ghostType.value = "";
-        // Focus after a tick so mobile browsers actually show the keyboard
-        setTimeout(() => {
-          try { ghostType.focus({ preventScroll: false }); } catch (e) {
-            try { ghostType.focus(); } catch (e2) {}
-          }
-        }, 50);
-      } else {
-        try { ghostType.blur(); } catch (e) {}
+    function gameTargets() {
+      const list = [];
+      const seen = new Set();
+      function add(t) {
+        if (!t || seen.has(t)) return;
+        seen.add(t);
+        list.push(t);
       }
+      try {
+        if (sameOrigin && targetDoc) {
+          const c =
+            targetDoc.getElementById("canvas") ||
+            targetDoc.querySelector("canvas");
+          add(c);
+          add(targetDoc.body);
+          add(targetDoc.documentElement);
+          add(targetDoc);
+          if (targetWin) add(targetWin);
+          try {
+            if (targetWin.Module && targetWin.Module.canvas) {
+              add(targetWin.Module.canvas);
+            }
+          } catch (e) {}
+        }
+      } catch (e) {}
+      const localCanvas =
+        document.getElementById("canvas") ||
+        document.querySelector("canvas");
+      add(localCanvas);
+      try {
+        if (window.Module && Module.canvas) add(Module.canvas);
+      } catch (e) {}
+      add(document.activeElement);
+      add(document.body);
+      add(document);
+      add(window);
+      return list;
     }
 
-    function forwardKeyFromGhost(type, key, code, keyCode) {
-      const targets = [];
-      if (sameOrigin && targetDoc) {
-        const c = targetDoc.getElementById("canvas") || targetDoc.querySelector("canvas");
-        if (c) targets.push(c);
-        targets.push(targetDoc);
-        if (targetWin) targets.push(targetWin);
-      }
-      // Always also try top window (harmless if unused)
-      targets.push(document);
-      targets.push(window);
-      for (const t of targets) {
+    function focusGameCanvas() {
+      try {
+        if (sameOrigin && targetDoc) {
+          const c =
+            targetDoc.getElementById("canvas") ||
+            targetDoc.querySelector("canvas");
+          if (c && c.focus) c.focus({ preventScroll: true });
+          if (targetWin) targetWin.focus();
+        }
+      } catch (e) {}
+      try {
+        const c =
+          document.getElementById("canvas") ||
+          document.querySelector("canvas");
+        if (c && c.focus) c.focus({ preventScroll: true });
+      } catch (e) {}
+    }
+
+    function fireKey(type, key, code, keyCode, charCode) {
+      const init = {
+        key: key,
+        code: code || "",
+        keyCode: keyCode | 0,
+        which: keyCode | 0,
+        charCode: charCode != null ? charCode | 0 : (type === "keypress" ? keyCode | 0 : 0),
+        bubbles: true,
+        cancelable: true,
+        composed: true,
+        view: window
+      };
+      for (const t of gameTargets()) {
         try {
-          const ev = new KeyboardEvent(type, {
-            key: key,
-            code: code,
-            keyCode: keyCode,
-            which: keyCode,
-            bubbles: true,
-            cancelable: true,
-            view: targetWin || window
-          });
+          const ev = new KeyboardEvent(type, init);
+          // Legacy readers (SDL / older engines)
           try {
-            Object.defineProperty(ev, "keyCode", { get: () => keyCode });
-            Object.defineProperty(ev, "which", { get: () => keyCode });
+            Object.defineProperty(ev, "keyCode", { get: () => keyCode | 0 });
+            Object.defineProperty(ev, "which", { get: () => keyCode | 0 });
+            Object.defineProperty(ev, "charCode", {
+              get: () =>
+                charCode != null
+                  ? charCode | 0
+                  : type === "keypress"
+                    ? keyCode | 0
+                    : 0
+            });
           } catch (e) {}
           t.dispatchEvent(ev);
         } catch (e) {}
       }
     }
 
-    function codeForChar(ch) {
-      if (ch === " ") return [" ", "Space", 32];
-      if (ch.length === 1) {
-        const up = ch.toUpperCase();
-        if (up >= "A" && up <= "Z") {
-          return [ch, "Key" + up, up.charCodeAt(0)];
-        }
-        if (ch >= "0" && ch <= "9") {
-          return [ch, "Digit" + ch, ch.charCodeAt(0)];
-        }
-        return [ch, "", ch.charCodeAt(0)];
+    function charToKey(ch) {
+      if (ch === "\n" || ch === "\r") {
+        return { key: "Enter", code: "Enter", keyCode: 13, charCode: 13 };
       }
-      return [ch, "", 0];
+      if (ch === " ") {
+        return { key: " ", code: "Space", keyCode: 32, charCode: 32 };
+      }
+      if (ch === "\b") {
+        return { key: "Backspace", code: "Backspace", keyCode: 8, charCode: 8 };
+      }
+      const codePt = ch.charCodeAt(0);
+      if (ch.length === 1 && ch >= "a" && ch <= "z") {
+        return {
+          key: ch,
+          code: "Key" + ch.toUpperCase(),
+          keyCode: ch.toUpperCase().charCodeAt(0),
+          charCode: codePt
+        };
+      }
+      if (ch.length === 1 && ch >= "A" && ch <= "Z") {
+        return {
+          key: ch,
+          code: "Key" + ch,
+          keyCode: codePt,
+          charCode: codePt
+        };
+      }
+      if (ch.length === 1 && ch >= "0" && ch <= "9") {
+        return {
+          key: ch,
+          code: "Digit" + ch,
+          keyCode: codePt,
+          charCode: codePt
+        };
+      }
+      // symbols — still send with charCode
+      return {
+        key: ch,
+        code: "",
+        keyCode: codePt,
+        charCode: codePt
+      };
+    }
+
+    function injectChar(ch) {
+      const k = charToKey(ch);
+      focusGameCanvas();
+      fireKey("keydown", k.key, k.code, k.keyCode, k.charCode);
+      fireKey("keypress", k.key, k.code, k.charCode || k.keyCode, k.charCode || k.keyCode);
+      fireKey("keyup", k.key, k.code, k.keyCode, 0);
+    }
+
+    function injectSpecial(name) {
+      const map = {
+        Backspace: { key: "Backspace", code: "Backspace", keyCode: 8 },
+        Enter: { key: "Enter", code: "Enter", keyCode: 13 },
+        Escape: { key: "Escape", code: "Escape", keyCode: 27 },
+        Tab: { key: "Tab", code: "Tab", keyCode: 9 },
+        Delete: { key: "Delete", code: "Delete", keyCode: 46 }
+      };
+      const k = map[name];
+      if (!k) return;
+      focusGameCanvas();
+      fireKey("keydown", k.key, k.code, k.keyCode, 0);
+      if (name === "Enter") {
+        fireKey("keypress", k.key, k.code, k.keyCode, k.keyCode);
+      }
+      fireKey("keyup", k.key, k.code, k.keyCode, 0);
+    }
+
+    async function injectString(str) {
+      if (typingBusy) return;
+      typingBusy = true;
+      try {
+        for (const ch of str) {
+          injectChar(ch);
+          await new Promise((r) => setTimeout(r, 30));
+        }
+      } finally {
+        typingBusy = false;
+      }
+    }
+
+    function setKeyboardOpen(on) {
+      keyboardOpen = !!on;
+      document.body.classList.toggle("keyboard-open", keyboardOpen);
+      if (!ghostType) return;
+      if (keyboardOpen) {
+        // Ensure send button exists next to field
+        ensureSendBtn();
+        ghostType.value = "";
+        setTimeout(() => {
+          try {
+            ghostType.focus({ preventScroll: false });
+          } catch (e) {
+            try {
+              ghostType.focus();
+            } catch (e2) {}
+          }
+        }, 30);
+      } else {
+        try {
+          ghostType.blur();
+        } catch (e) {}
+      }
+    }
+
+    function ensureSendBtn() {
+      if (document.getElementById("ghost-send")) return;
+      const btn = document.createElement("button");
+      btn.id = "ghost-send";
+      btn.type = "button";
+      btn.textContent = "Send";
+      btn.style.cssText =
+        "position:fixed;right:8px;bottom:8px;z-index:116;padding:10px 14px;" +
+        "min-height:40px;border:0;border-radius:8px;background:#6ec26e;color:#183318;" +
+        "font-weight:700;font-size:15px;display:none;";
+      document.body.appendChild(btn);
+      const sync = () => {
+        btn.style.display = keyboardOpen ? "block" : "none";
+      };
+      const _set = setKeyboardOpen;
+      // patch visibility on toggle
+      btn.addEventListener("click", async (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const text = ghostType.value || "";
+        if (!text) {
+          injectSpecial("Enter");
+          return;
+        }
+        await injectString(text);
+        ghostType.value = "";
+        // Confirm with Enter for most profile UIs
+        injectSpecial("Enter");
+        setTimeout(() => {
+          try {
+            ghostType.focus();
+          } catch (e) {}
+        }, 50);
+      });
+      // show/hide with keyboard
+      const obs = new MutationObserver(sync);
+      obs.observe(document.body, { attributes: true, attributeFilter: ["class"] });
+      sync();
     }
 
     if (fabKeyboard) {
-      fabKeyboard.addEventListener("click", (e) => {
+      const toggle = (e) => {
         e.preventDefault();
         e.stopPropagation();
         setKeyboardOpen(!keyboardOpen);
-      });
-      // Don't let the touch overlay steal the tap
-      fabKeyboard.addEventListener("touchend", (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        setKeyboardOpen(!keyboardOpen);
-      }, { passive: false });
+      };
+      fabKeyboard.addEventListener("click", toggle);
+      fabKeyboard.addEventListener("touchend", toggle, { passive: false });
     }
 
     if (ghostType) {
+      ensureSendBtn();
       ghostType.addEventListener("keydown", (e) => {
-        // Let special keys through to the game
-        const special = {
-          Backspace: ["Backspace", "Backspace", 8],
-          Enter: ["Enter", "Enter", 13],
-          Escape: ["Escape", "Escape", 27],
-          Tab: ["Tab", "Tab", 9],
-          ArrowLeft: ["ArrowLeft", "ArrowLeft", 37],
-          ArrowRight: ["ArrowRight", "ArrowRight", 39],
-          ArrowUp: ["ArrowUp", "ArrowUp", 38],
-          ArrowDown: ["ArrowDown", "ArrowDown", 40],
-          Delete: ["Delete", "Delete", 46]
-        };
-        if (special[e.key]) {
-          const [k, c, kc] = special[e.key];
-          forwardKeyFromGhost("keydown", k, c, kc);
-          // Don't preventDefault on Backspace so the field stays usable;
-          // still forward so game text fields get it.
+        if (e.key === "Backspace") {
+          injectSpecial("Backspace");
+          return;
+        }
+        if (e.key === "Enter") {
+          e.preventDefault();
+          const text = ghostType.value || "";
+          if (text) {
+            injectString(text).then(() => {
+              ghostType.value = "";
+              injectSpecial("Enter");
+            });
+          } else {
+            injectSpecial("Enter");
+          }
+          return;
+        }
+        if (e.key === "Escape") {
+          injectSpecial("Escape");
+          setKeyboardOpen(false);
+          return;
         }
       });
-      ghostType.addEventListener("keyup", (e) => {
-        const special = {
-          Backspace: ["Backspace", "Backspace", 8],
-          Enter: ["Enter", "Enter", 13],
-          Escape: ["Escape", "Escape", 27],
-          Tab: ["Tab", "Tab", 9]
-        };
-        if (special[e.key]) {
-          const [k, c, kc] = special[e.key];
-          forwardKeyFromGhost("keyup", k, c, kc);
+      // Live typing: each inserted character
+      ghostType.addEventListener("beforeinput", (e) => {
+        // Prefer beforeinput — has insertText data on mobile
+        if (e.inputType === "insertText" && e.data) {
+          injectChar(e.data);
+          // keep field empty so we only get deltas
+          // (don't preventDefault — mobile keyboards can break)
+        } else if (
+          e.inputType === "deleteContentBackward" ||
+          e.inputType === "deleteContentForward"
+        ) {
+          injectSpecial("Backspace");
         }
       });
-      ghostType.addEventListener("input", (e) => {
+      ghostType.addEventListener("input", () => {
         const val = ghostType.value;
         if (!val) return;
-        // Forward each new character as keydown+keyup
-        for (const ch of val) {
-          const [k, c, kc] = codeForChar(ch);
-          forwardKeyFromGhost("keydown", k, c, kc);
-          forwardKeyFromGhost("keyup", k, c, kc);
-        }
+        // Fallback if beforeinput didn't fire
+        for (const ch of val) injectChar(ch);
         ghostType.value = "";
       });
       ghostType.addEventListener("blur", () => {
-        // Small delay: iOS may blur briefly while rearranging
         setTimeout(() => {
-          if (keyboardOpen && document.activeElement !== ghostType) {
-            document.body.classList.remove("keyboard-open");
+          if (
+            keyboardOpen &&
+            document.activeElement !== ghostType &&
+            document.activeElement !== document.getElementById("ghost-send")
+          ) {
             keyboardOpen = false;
+            document.body.classList.remove("keyboard-open");
+            const b = document.getElementById("ghost-send");
+            if (b) b.style.display = "none";
           }
-        }, 200);
+        }, 250);
       });
     }
+
 
     window.addEventListener("resize", applyLayout);
     applyLayout();
